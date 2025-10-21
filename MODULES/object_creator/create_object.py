@@ -23,7 +23,6 @@ class Termo:
         self.gestor = gestor 
 
     def setRelatorioInfo(self, liquidacao, valor, data):
-        self.contratado = self.contratado
         self.liquidacao = liquidacao 
         self.valor = valor 
         self.data = data 
@@ -271,8 +270,71 @@ class Termo:
 
       if ask_it == "y": update_protocol()
 
-      
+class DocCreator: 
     
+    doc = Document()
+    
+    def __init__(self, tabela_info):
+        self.tabela_info = tabela_info
+    # Tabela precisa de colunas, linhas, campos, dados de preenchimento
+    # Merge customizado  
+    def alinhar_elemento(elemento, alinhamento):
+        if (alinhamento == "CENTER"): 
+            elemento.alignment = WD_ALIGN_PARAGRAPH.CENTER 
+    
+    def criar_uma_tabela(self):
+        tabela = DocCreator.doc.add_table(rows= self.tabela_info["linhas"], cols = self.tabela_info["colunas"])
+        tabela.style = "Table Grid"
+        
+        if (self.tabela_info["merge"] == True): 
+            DETALHES_MERGE = self.tabela_info["detalhes_merge"] 
+            for merge in DETALHES_MERGE:
+                celula_referenciada = DETALHES_MERGE[merge]["celula_referenciada"]
+                range_do_merge = DETALHES_MERGE[merge]["range_para_merge"]
+                celula = tabela.cell(celula_referenciada[0], celula_referenciada[1]).merge(tabela.cell(range_do_merge[0], range_do_merge[1]))
+                
+            
+        #p = celula.paragraphs[0]
+        #run = p.add_run("1- IDENTIFICAÇÃO")
+        #run.bold = True
+        #p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        DocCreator.doc.save("test.docx")
+      
+def teste_doc():
+    tabela_info = {
+        "linhas": 8,
+        "colunas": 2,
+        "campos": [],
+        "dados": [],
+        "merge": True,
+        "detalhes_merge": { "primeiro_merge": {
+                            "celula_referenciada": (0, 0),
+                            "range_para_merge": (0, 1),
+                            "id_célula": "IDENTIFICAÇÃO"
+                        },
+                       "segundo_merge": {
+                            "celula_referenciada": (5, 0),
+                            "range_para_merge": (5, 1),
+                            "id_célula": "CUMPRIMENTO_OBRIGAÇÕES"
+                        },
+                        "terceiro_merge": {
+                            "celula_referenciada": (6, 0),
+                            "range_para_merge": (6, 1),
+                            "id_célula": "POR_ESTE_INSTRUMENTO"
+                        },
+                        "quarto_merge": {
+                            "celula_referenciada": (7, 0),
+                            "range_para_merge": (7, 1),
+                            "id_célula": "CONSTITUI_AINDA"
+                        }
+                    }
+    }
+    test = DocCreator(tabela_info)
+    test.criar_uma_tabela()
+
+teste_doc()
+
+"""
 def capturar_info_planilha(localizacao_planilha):
 
     def formatar_data(objeto):
@@ -314,3 +376,4 @@ def capturar_info_planilha(localizacao_planilha):
             TERMOS.append(novo_termo)
 
     return TERMOS
+"""
