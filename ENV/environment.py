@@ -2,10 +2,8 @@
 def pegar_endereco_base():
     return r"C:\Users\Usuario\Documents\MURILO\3. ANÁLISES DE NOTAS FISCAIS\1. ANÁLISE MENSAL\10. OUTUBRO"
   
-
-
 def pegar_planilha_termo(arquivo):
-    return rf"C:\Users\Usuario\Documents\MURILO\3. ANÁLISES DE NOTAS FISCAIS\2. GERADOR\INFO\{arquivo}"
+    return rf"C:\Users\Usuario\Documents\MURILO\3. ANÁLISES DE NOTAS FISCAIS\1. ANÁLISE MENSAL\INFO\{arquivo}"
     
 def pegar_tipo_termo(prompt):
     if (prompt == "ata"):
