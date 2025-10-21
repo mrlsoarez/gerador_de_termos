@@ -278,54 +278,91 @@ class DocCreator:
         self.tabela_info = tabela_info
     # Tabela precisa de colunas, linhas, campos, dados de preenchimento
     # Merge customizado  
-    def alinhar_elemento(elemento, alinhamento):
-        if (alinhamento == "CENTER"): 
+    def alinhar_elemento(elemento, alinhado):
+        if (alinhado == "Center"): 
             elemento.alignment = WD_ALIGN_PARAGRAPH.CENTER 
     
+    def deixar_negrito(elemento): 
+        elemento.bold = True
+        return elemento 
+    
     def criar_uma_tabela(self):
+        
         tabela = DocCreator.doc.add_table(rows= self.tabela_info["linhas"], cols = self.tabela_info["colunas"])
         tabela.style = "Table Grid"
         
         if (self.tabela_info["merge"] == True): 
             DETALHES_MERGE = self.tabela_info["detalhes_merge"] 
             for merge in DETALHES_MERGE:
+                
                 celula_referenciada = DETALHES_MERGE[merge]["celula_referenciada"]
                 range_do_merge = DETALHES_MERGE[merge]["range_para_merge"]
+                
                 celula = tabela.cell(celula_referenciada[0], celula_referenciada[1]).merge(tabela.cell(range_do_merge[0], range_do_merge[1]))
+                text = DETALHES_MERGE[merge]["conteudo"]
+                
+                paragraph = celula.paragraphs[0]
+                
+                if (DETALHES_MERGE[merge]["negrito"]): 
+                    paragraph.add_run(text).bold = True 
+                if (DETALHES_MERGE[merge]["alinhado"] != None):
+                    DocCreator.alinhar_elemento(paragraph, DETALHES_MERGE[merge]["alinhado"])
+                else: 
+                    paragraph.add_run(text)
+                    
+               
                 
             
+                #celula.text = paragraph
+                #if (DETALHES_MERGE[merge]["alinhado"] != ""): DocCreator.alinhar_elemento(celula, )
+                """
+                p = celula.paragraphs[0]
+                run = p.add_run("1- IDENTIFICAÇÃO")
+                run.bold = True
+                p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                """
+
         #p = celula.paragraphs[0]
         #run = p.add_run("1- IDENTIFICAÇÃO")
         #run.bold = True
         #p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        DocCreator.doc.save("test.docx")
+        DocCreator.doc.save("test3.docx")
       
 def teste_doc():
+    
     tabela_info = {
         "linhas": 8,
         "colunas": 2,
-        "campos": [],
-        "dados": [],
+        "campos": ["CONTRATO N°", "CONTRATADO", "OBJETO", "AUTORIZAÇÃO DE FORNECIMENTO"],
+        "dados": ["020/25", "POLISINI", "OAISOAI", "2025/25"],
         "merge": True,
         "detalhes_merge": { "primeiro_merge": {
                             "celula_referenciada": (0, 0),
                             "range_para_merge": (0, 1),
-                            "id_célula": "IDENTIFICAÇÃO"
+                            "conteudo": "1 - IDENTIFICAÇÃO",
+                            "negrito": True,
+                            "alinhado": "Center",
                         },
                        "segundo_merge": {
                             "celula_referenciada": (5, 0),
                             "range_para_merge": (5, 1),
-                            "id_célula": "CUMPRIMENTO_OBRIGAÇÕES"
+                            "conteudo": "2 - CUMPRIMENTO DAS OBRIGAÇÕES",
+                            "negrito": True, 
+                            "alinhado": "Center",
                         },
                         "terceiro_merge": {
                             "celula_referenciada": (6, 0),
                             "range_para_merge": (6, 1),
-                            "id_célula": "POR_ESTE_INSTRUMENTO"
+                            "conteudo": "Por este instrumento, em caráter DEFINITIVO, atestamos que os alimentos acima identificados atendem às exigências contratuais", 
+                            "negrito": False, 
+                            "alinhado": None,
                         },
                         "quarto_merge": {
                             "celula_referenciada": (7, 0),
                             "range_para_merge": (7, 1),
-                            "id_célula": "CONSTITUI_AINDA"
+                            "conteudo": "Constitui ainda eficácia liberatória de todas as obrigações estabelecidas em contratado referentes ao objeto acima mencionado, exceto as garantias legais, bem como autorizamos a restituição de todas as garantias e/ou caução prestadas.",
+                            "negrito": False, 
+                            "alinhado": None,
                         }
                     }
     }
