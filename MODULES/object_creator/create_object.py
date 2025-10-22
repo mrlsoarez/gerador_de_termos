@@ -32,6 +32,18 @@ class Termo:
 
         doc = Document()
         
+        def image_in_header(doc):
+            section = doc.sections[0]
+            header = section.header
+            
+            header.paragraphs[0].clear()
+
+            paragraph = header.add_paragraph()
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER  
+
+            run = paragraph.add_run()
+            run.add_picture(r"C:\Users\Usuario\Pictures\HEADER.png", width=Inches(6)) 
+      
         def criar_tabela(doc):
 
             tabela = doc.add_table(rows=6, cols=2)
@@ -131,10 +143,41 @@ class Termo:
             gestor.alignment = WD_ALIGN_PARAGRAPH.CENTER
             run = gestor.runs[0]
             run.bold = True
+        
+        def footer(doc):
+            section = doc.sections[0]
+            footer = section.footer
 
+    
+            footer.paragraphs[0].clear()
+
+    # === LINE IMAGE ===
+            paragraph_img = footer.add_paragraph()
+            paragraph_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            run_img = paragraph_img.add_run()
+            run_img.add_picture(r"C:\Users\Usuario\Pictures\LINHA.png", width=Inches(6))
+
+    # === CONTACT TEXT ===
+            paragraph_text = footer.add_paragraph()
+            paragraph_text.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+            run_text = paragraph_text.add_run(
+                "Avenida Aquidauana, Nº 1001 - Centro | Fone: (67) 3541-5100\n"
+                "CEP 79.780-000 | CNPJ 03.576.220/0001-56\n"
+                "www.bataguassu.ms.gov.br | gabinete@bataguassu.ms.gov.br"
+            )
+
+            # Optional formatting
+            font = run_text.font
+            font.size = Pt(8)
+            font.name = "Arial"
+        
+        
+            
         nome_arquivo = f"{Termo.index}. {self.contratado} - AF {self.af[:4]}"
         Termo.index += 1
 
+        image_in_header(doc)
         criar_titulo(doc)
         doc.add_paragraph("")
         criar_tabela(doc)
@@ -142,6 +185,7 @@ class Termo:
         criar_data(doc)
         doc.add_paragraph("") 
         criar_assinatura(doc)
+        footer(doc)
 
         doc.save(nome_arquivo + ".docx")
         
