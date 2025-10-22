@@ -272,7 +272,7 @@ class Termo:
 
 class DocCreator: 
     
-    doc = Document()
+    index = 1
     
     def __init__(self, tabela_info):
         self.tabela_info = tabela_info
@@ -286,11 +286,41 @@ class DocCreator:
         elemento.bold = True
         return elemento 
     
-    def criar_uma_tabela(self):
+    def criar_uma_tabela(self, doc):
         
-        tabela = DocCreator.doc.add_table(rows= self.tabela_info["linhas"], cols = self.tabela_info["colunas"])
+        tabela = doc.add_table(rows= self.tabela_info["linhas"], cols = self.tabela_info["colunas"])
         tabela.style = "Table Grid"
         
+        DETALHES_CAMPO = self.tabela_info["campos"]
+        
+        for detalhes in DETALHES_CAMPO:
+            conteudo = DETALHES_CAMPO[detalhes]["conteudo"]
+            celula_referenciada = DETALHES_CAMPO[detalhes]["celula_referenciada"]
+            
+            if (DETALHES_CAMPO[detalhes]["merge"]):
+                range_do_merge = DETALHES_CAMPO[detalhes]["range_para_merge"]
+                celula = tabela.cell(celula_referenciada[0], celula_referenciada[1]).merge(tabela.cell(range_do_merge[0], range_do_merge[1]))
+            else: 
+                celula = tabela.cell(celula_referenciada[0], celula_referenciada[1])
+                
+            paragraph = celula.paragraphs[0]
+           
+            if (DETALHES_CAMPO[detalhes]["negrito"]): paragraph.add_run(conteudo).bold = True 
+            else: paragraph.add_run(conteudo)
+            if (DETALHES_CAMPO[detalhes]["alinhado"]): DocCreator.alinhar_elemento(paragraph, DETALHES_CAMPO[detalhes]["alinhado"])
+        
+        range_inicio = self.tabela_info["range_dados_inicio"][0] 
+        range_final = self.tabela_info["range_dados_final"][1] + 1
+        dados = self.tabela_info["dados"]
+        
+        for i in range(range_inicio, range_final): 
+            tabela.cell(i, 1).text = dados[i - 1]
+           
+        
+        
+                
+                
+        """
         if (self.tabela_info["merge"] == True): 
             DETALHES_MERGE = self.tabela_info["detalhes_merge"] 
             for merge in DETALHES_MERGE:
@@ -309,65 +339,120 @@ class DocCreator:
                     DocCreator.alinhar_elemento(paragraph, DETALHES_MERGE[merge]["alinhado"])
                 else: 
                     paragraph.add_run(text)
+        """
                     
-               
+        
                 
             
                 #celula.text = paragraph
                 #if (DETALHES_MERGE[merge]["alinhado"] != ""): DocCreator.alinhar_elemento(celula, )
-                """
-                p = celula.paragraphs[0]
-                run = p.add_run("1- IDENTIFICAÇÃO")
-                run.bold = True
-                p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                """
+              
 
         #p = celula.paragraphs[0]
         #run = p.add_run("1- IDENTIFICAÇÃO")
         #run.bold = True
         #p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        DocCreator.doc.save("test3.docx")
+        doc.save(f"test{DocCreator.index}.docx")
+        DocCreator.index += 1
       
+def objeto_teste():
+    TERMOS = [
+    Termo("CONTRATO 001/2025", "EMPRESA ALFA LTDA", "Fornecimento de material de escritório", "AF-1234", "Entrega concluída com sucesso.", "GESTOR DE CONTRATO\nRONALDO DE SOUZA MARCILIO"),
+    Termo("ATA 002/2025", "SUPRIMENTOS BETA ME", "Registro de preços para gêneros alimentícios", "AF-2234", "Execução conforme cronograma.", "GESTOR DE ATA\nMURILO SOARES DE OLIVEIRA"),
+    Termo("CONTRATO 003/2025", "SERVIÇOS GAMA EIRELI", "Prestação de serviços de limpeza", "AF-3234", "Serviços executados parcialmente.", "GESTOR DE CONTRATO\nRONALDO DE SOUZA MARCILIO"),
+    Termo("ATA 004/2025", "ALIMENTOS DELTA LTDA", "Registro de preços para merenda escolar", "AF-4234", "Fornecimento regular e satisfatório.", "GESTOR DE ATA\nMURILO SOARES DE OLIVEIRA"),
+    Termo("CONTRATO 005/2025", "TECNOLOGIA ÔMEGA S/A", "Licenciamento de software e suporte técnico", "AF-5234", "Sistema implantado e testado.", "GESTOR DE CONTRATO\nRONALDO DE SOUZA MARCILIO")
+    ]
+
+# Exemplo opcional: atribuir informações de relatório a cada termo
+    TERMOS[0].setRelatorioInfo("LIQ-1001", 12500.00, "10/03/2025")
+    TERMOS[1].setRelatorioInfo("LIQ-1002", 8500.50, "18/03/2025")
+    TERMOS[2].setRelatorioInfo("LIQ-1003", 22000.00, "25/03/2025")
+    TERMOS[3].setRelatorioInfo("LIQ-1004", 14200.75, "29/03/2025")
+    TERMOS[4].setRelatorioInfo("LIQ-1005", 18750.00, "02/04/2025")
+    
+    return TERMOS 
 def teste_doc():
     
-    tabela_info = {
+    def get_tabela_info(obj):
+        return {
         "linhas": 8,
         "colunas": 2,
-        "campos": ["CONTRATO N°", "CONTRATADO", "OBJETO", "AUTORIZAÇÃO DE FORNECIMENTO"],
-        "dados": ["020/25", "POLISINI", "OAISOAI", "2025/25"],
+        "dados": [obj.contrato, obj.contratado, obj.objeto, obj.af],
+        "range_dados_inicio": (1,1),
+        "range_dados_final": (1,4),
         "merge": True,
-        "detalhes_merge": { "primeiro_merge": {
+        "campos": { "primeiro_campo": {
                             "celula_referenciada": (0, 0),
                             "range_para_merge": (0, 1),
+                            "merge": True,
                             "conteudo": "1 - IDENTIFICAÇÃO",
                             "negrito": True,
                             "alinhado": "Center",
                         },
-                       "segundo_merge": {
+                       "segundo_campo": {
+                            "celula_referenciada": (1, 0),
+                            "conteudo": "CONTRATO N°",
+                            "merge": False,
+                            "negrito": True,
+                            "alinhado": False,
+                        },
+                        "terceiro_campo": {
+                            "celula_referenciada": (2, 0),
+                            "conteudo": "CONTRATADO",
+                            "merge": False,
+                            "negrito": True,
+                            "alinhado": False,
+                        },
+                        "quarto_campo": {
+                            "celula_referenciada": (3, 0),
+                            "conteudo": "OBJETO",
+                            "negrito": True,
+                            "merge": False,
+                            "alinhado": False,
+                        }, 
+                        "quinto_campo": {
+                            "celula_referenciada": (4, 0),
+                            "conteudo": "AUTORIZACAO DE FORNECIMENTO",
+                            "merge": False,
+                            "negrito": True,
+                            "alinhado": False,
+                        }, 
+                        "sexto_campo": {
                             "celula_referenciada": (5, 0),
                             "range_para_merge": (5, 1),
+                            "merge": True,
                             "conteudo": "2 - CUMPRIMENTO DAS OBRIGAÇÕES",
                             "negrito": True, 
-                            "alinhado": "Center",
+                            "alinhado": "Center"
                         },
-                        "terceiro_merge": {
+                        "setimo_campo": {
                             "celula_referenciada": (6, 0),
                             "range_para_merge": (6, 1),
-                            "conteudo": "Por este instrumento, em caráter DEFINITIVO, atestamos que os alimentos acima identificados atendem às exigências contratuais", 
+                            "merge": True,
+                            "conteudo": obj.mensagem, 
                             "negrito": False, 
-                            "alinhado": None,
+                            "alinhado": False
                         },
-                        "quarto_merge": {
+                        "oitavo_campo": {
                             "celula_referenciada": (7, 0),
                             "range_para_merge": (7, 1),
+                            "merge": True,
                             "conteudo": "Constitui ainda eficácia liberatória de todas as obrigações estabelecidas em contratado referentes ao objeto acima mencionado, exceto as garantias legais, bem como autorizamos a restituição de todas as garantias e/ou caução prestadas.",
                             "negrito": False, 
-                            "alinhado": None,
+                            "alinhado": False
                         }
-                    }
+        }
     }
-    test = DocCreator(tabela_info)
-    test.criar_uma_tabela()
+    
+    termos = objeto_teste()
+    
+    for i in range(len(termos)):
+        tabela_info = get_tabela_info(termos[i])
+        doc = Document()
+        for key in tabela_info:
+            test = DocCreator(tabela_info)
+        test.criar_uma_tabela(doc)
 
 teste_doc()
 
