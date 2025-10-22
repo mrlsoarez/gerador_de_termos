@@ -151,13 +151,12 @@ class Termo:
     
             footer.paragraphs[0].clear()
 
-    # === LINE IMAGE ===
+    
             paragraph_img = footer.add_paragraph()
             paragraph_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
             run_img = paragraph_img.add_run()
             run_img.add_picture(r"C:\Users\Usuario\Pictures\LINHA.png", width=Inches(6))
 
-    # === CONTACT TEXT ===
             paragraph_text = footer.add_paragraph()
             paragraph_text.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
