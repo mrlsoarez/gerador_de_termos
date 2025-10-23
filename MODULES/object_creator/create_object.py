@@ -354,7 +354,7 @@ class DocCreator:
         #p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         return tabela 
         
-      
+
 def objeto_teste():
     TERMOS = [
     Termo("CONTRATO 001/2025", "EMPRESA ALFA LTDA", "Fornecimento de material de escritório", "AF-1234", "Entrega concluída com sucesso.", "GESTOR DE CONTRATO\nRONALDO DE SOUZA MARCILIO"),
