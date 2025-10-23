@@ -10,6 +10,8 @@ from docx2pdf import convert
 import locale
 import os
 
+
+"""
 class Termo:
 
     index = 1 
@@ -319,8 +321,7 @@ class DocCreator:
         
         
                 
-                
-        """
+     
         if (self.tabela_info["merge"] == True): 
             DETALHES_MERGE = self.tabela_info["detalhes_merge"] 
             for merge in DETALHES_MERGE:
@@ -339,7 +340,7 @@ class DocCreator:
                     DocCreator.alinhar_elemento(paragraph, DETALHES_MERGE[merge]["alinhado"])
                 else: 
                     paragraph.add_run(text)
-        """
+  
                     
         
                 
@@ -461,6 +462,7 @@ def teste_doc():
 
 #teste_doc()
 
+"""
 """
 def capturar_info_planilha(localizacao_planilha):
 
