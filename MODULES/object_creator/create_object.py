@@ -276,8 +276,7 @@ class DocCreator:
     
     def __init__(self, tabela_info):
         self.tabela_info = tabela_info
-    # Tabela precisa de colunas, linhas, campos, dados de preenchimento
-    # Merge customizado  
+      
     def alinhar_elemento(elemento, alinhado):
         if (alinhado == "Center"): 
             elemento.alignment = WD_ALIGN_PARAGRAPH.CENTER 
@@ -288,11 +287,12 @@ class DocCreator:
     
     def criar_uma_tabela(self, doc):
         
-        tabela = doc.add_table(rows= self.tabela_info["linhas"], cols = self.tabela_info["colunas"])
-        tabela.style = "Table Grid"
+        if (self.incremental):
+            tabela = doc.add_table(rows= self.tabela_info["linhas"], cols = self.tabela_info["colunas"])
+            tabela.style = "Table Grid"
         
         DETALHES_CAMPO = self.tabela_info["campos"]
-        
+
         for detalhes in DETALHES_CAMPO:
             conteudo = DETALHES_CAMPO[detalhes]["conteudo"]
             celula_referenciada = DETALHES_CAMPO[detalhes]["celula_referenciada"]
@@ -352,8 +352,8 @@ class DocCreator:
         #run = p.add_run("1- IDENTIFICAÇÃO")
         #run.bold = True
         #p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        doc.save(f"test{DocCreator.index}.docx")
-        DocCreator.index += 1
+        return tabela 
+        
       
 def objeto_teste():
     TERMOS = [
@@ -374,11 +374,14 @@ def objeto_teste():
     return TERMOS 
 def teste_doc():
     
-    def get_tabela_info(obj):
+    doc = Document()
+    
+    def get_tabela_info(obj, *args):
         return {
         "linhas": 8,
         "colunas": 2,
-        "dados": [obj.contrato, obj.contratado, obj.objeto, obj.af],
+        "dados": obj,
+        "incremental": False,
         "range_dados_inicio": (1,1),
         "range_dados_final": (1,4),
         "merge": True,
@@ -448,13 +451,15 @@ def teste_doc():
     termos = objeto_teste()
     
     for i in range(len(termos)):
-        tabela_info = get_tabela_info(termos[i])
+        tabela_info = get_tabela_info(termos)
         doc = Document()
         for key in tabela_info:
             test = DocCreator(tabela_info)
         test.criar_uma_tabela(doc)
 
-teste_doc()
+    
+
+#teste_doc()
 
 """
 def capturar_info_planilha(localizacao_planilha):
