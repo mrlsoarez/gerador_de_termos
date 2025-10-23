@@ -1,9 +1,12 @@
 # Pasta onde ficará armazenado os termos, separados por datas
+
+ROOT = r"C:\Users\Usuario\Documents\MURILO"
+
 def pegar_endereco_base():
-    return r"C:\Users\Usuario\Documents\MURILO\3. ANÁLISES DE NOTAS FISCAIS\1. ANÁLISE MENSAL\10. OUTUBRO"
+    return rf"{ROOT}\3. ANÁLISES DE NOTAS FISCAIS\1. ANÁLISE MENSAL\10. OUTUBRO"
   
 def pegar_planilha_termo(arquivo):
-    return rf"C:\Users\Usuario\Documents\MURILO\3. ANÁLISES DE NOTAS FISCAIS\1. ANÁLISE MENSAL\INFO\{arquivo}"
+    return rf"{ROOT}\3. ANÁLISES DE NOTAS FISCAIS\1. ANÁLISE MENSAL\INFO\{arquivo}"
     
 def pegar_tipo_termo(prompt):
     if (prompt == "ata"):
