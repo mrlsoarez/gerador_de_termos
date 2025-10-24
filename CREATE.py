@@ -11,10 +11,20 @@ NUMERO_ATUAL_PROTOCOLO = pegar_numero_protocolo()
 def MAIN():
 
     PASTA_BASE = pegar_endereco_base()
-    PROMPT_INICIAL = input("Digite o tipo de documentos: (Contrato ou ata): ").lower()
-    TIPO_TERMO = pegar_tipo_termo(PROMPT_INICIAL) 
+    PROMPT_INICIAL = input("Digite o tipo de documentos: (Contrato, ata ou ambos?): ").lower()
 
+    if PROMPT_INICIAL == "ambos":
+        TIPO_TERMO = pegar_tipo_termo("contrato")
+        CRIAR_PASTAS_INICIAIS(PASTA_BASE, TIPO_TERMO)
+        GERAR_TERMOS_E_PROTOCOLOS(TIPO_TERMO)
+        TIPO_TERMO = pegar_tipo_termo("ata")
+        CRIAR_PASTAS_INICIAIS(PASTA_BASE, TIPO_TERMO)
+        GERAR_TERMOS_E_PROTOCOLOS(TIPO_TERMO, mesmo_protocolo = True)
+        return 
+    
+    TIPO_TERMO = pegar_tipo_termo(PROMPT_INICIAL)
     CRIAR_PASTAS_INICIAIS(PASTA_BASE, TIPO_TERMO)
+
     GERAR_TERMOS_E_PROTOCOLOS(TIPO_TERMO)
 
 # Cria as pastas para guardar os termos e relatório
@@ -42,22 +52,22 @@ def CRIAR_PASTAS_INICIAIS(endereco_base, tipo_termo):
     criar_pasta("PDF")
     criar_pasta("WORD", navegar = True)
 
-def GERAR_TERMOS_E_PROTOCOLOS(tipo_termo):
+def GERAR_TERMOS_E_PROTOCOLOS(tipo, mesmo_protocolo = False):
 
-    localizacao_planilha = pegar_planilha_termo(tipo_termo["arquivo"])
+    localizacao_planilha = pegar_planilha_termo(tipo["arquivo"])
     
     TERMOS = capturar_info_planilha(localizacao_planilha)
     
     for index in range(len(TERMOS)):
-        TERMOS[index].criar_doc_termo(tipo_termo["corresponde_a"])
+        TERMOS[index].criar_termo(tipo)
         print(f"Termo criado!!! (verificar na pasta) --> {TERMOS[index].contratado} (AF {TERMOS[index].af})")
         pass 
     
-    os.chdir(r"../..")
-     
-    Termo.gerar_relatorio(TERMOS, NUMERO_ATUAL_PROTOCOLO)
+    os.chdir(r"../../PROTOCOLOS")
+
+    Termo.criar_relatorio(TERMOS, NUMERO_ATUAL_PROTOCOLO, mesmo_protocolo)
    
-    print("Relatório gerado! :)")
+    #print("Relatório gerado! :)")
 
 
 MAIN()
