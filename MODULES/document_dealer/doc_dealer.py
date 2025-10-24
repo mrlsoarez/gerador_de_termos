@@ -5,7 +5,7 @@ from docx.shared import Pt
 class DocHelper:
 
     def mudar_fonte(texto):
-        texto.font.name = "Cambria"
+        texto.font.name = "Times New Roman"
     
     def mudar_tamanho(texto, px): 
         texto.font.size = Pt(px)

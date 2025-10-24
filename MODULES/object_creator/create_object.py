@@ -54,7 +54,7 @@ class Termo:
              
             if "credenciamento" in self.objeto.lower():
                 campo = "CREDENCIAMENTO N°"
-            elif tipo == "ata":
+            elif tipo["corresponde_a"] == "ata":
                 campo = "ATA N°"
             else:
                 campo = "CONTRATO N°" 
@@ -90,7 +90,7 @@ class Termo:
         adicionar_assinatura()
 
         doc.save(termo)
-        #Termo.salvar_pdf(termo[:-5])
+        Termo.salvar_pdf(termo[:-5])
         
     def salvar_pdf(docx):
         pdf = docx.replace("WORD", "PDF") + ".pdf"
@@ -109,7 +109,7 @@ class Termo:
         
         def adicionar_protocolo():
             substituir_protocolo = doc.paragraphs[1]
-            substituir_protocolo.text = f"PROTOCOLO DE RECEBIMENTO - N° {numero_protocolo}"
+            substituir_protocolo.text = DocHelper.criar_texto(substituir_protocolo, f"PROTOCOLO DE RECEBIMENTO - NÚMERO {numero_protocolo}", negrito = True)
 
         def criar_tabela():
             
@@ -122,11 +122,11 @@ class Termo:
                 coluna_dois = nova_linha.cells[1].paragraphs[0]
                 coluna_tres = nova_linha.cells[2].paragraphs[0]
                 coluna_quatro = nova_linha.cells[3].paragraphs[0]
-
-                DocHelper.criar_texto(coluna_um, termos[i].contratado, px = 7)
-                DocHelper.criar_texto(coluna_dois, termos[i].liquidacao, px = 7)
-                DocHelper.criar_texto(coluna_tres, termos[i].data, px = 7)
-                DocHelper.criar_texto(coluna_quatro, converter_currency(termos[i].valor), px = 7)
+                
+                DocHelper.criar_texto(coluna_um, termos[i].contratado, px = 8)
+                DocHelper.criar_texto(coluna_dois, termos[i].liquidacao, px = 8)
+                DocHelper.criar_texto(coluna_tres, termos[i].data, px = 8)
+                DocHelper.criar_texto(coluna_quatro, converter_currency(termos[i].valor), px = 8)
            
         adicionar_protocolo() 
         criar_tabela()
