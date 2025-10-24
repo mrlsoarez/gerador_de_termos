@@ -20,7 +20,7 @@ class DocHelper:
                 paragrafo.alignment = WD_ALIGN_PARAGRAPH.CENTER
             elif (alinhado == "Direita"):
                 paragrafo.alignment = WD_ALIGN_PARAGRAPH.RIGHT 
-        
+
         run = paragrafo.add_run(texto)
         
         DocHelper.mudar_fonte(run)
