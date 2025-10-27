@@ -60,7 +60,7 @@ def GERAR_TERMOS_E_PROTOCOLOS(tipo, mesmo_protocolo = False):
     
     for index in range(len(TERMOS)):
         TERMOS[index].criar_termo(tipo)
-        print(f"Termo criado!!! (verificar na pasta) --> {TERMOS[index].contratado} (AF {TERMOS[index].af})")
+        #print(f"Termo criado!!! (verificar na pasta) --> {TERMOS[index].contratado} (AF {TERMOS[index].af})")
         pass 
     
     os.chdir(r"../../PROTOCOLOS")

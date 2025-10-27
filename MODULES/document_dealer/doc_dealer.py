@@ -66,7 +66,7 @@ class DocHelper:
             celula = tabela.cell(dado["celula"][0], dado["celula"][1])
             paragrafo = celula.paragraphs[0]  
 
-            DocHelper.criar_texto(paragrafo, dado["conteudo"], dado["negrito"])
+            DocHelper.criar_texto(paragrafo, dado["conteudo"], dado["negrito"], px = 10)
 
         return tabela
          
