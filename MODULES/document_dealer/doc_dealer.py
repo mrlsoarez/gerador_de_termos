@@ -4,13 +4,13 @@ from docx.shared import Pt
 
 class DocHelper:
 
-    def mudar_fonte(texto):
-        texto.font.name = "Times New Roman"
+    def mudar_fonte(texto, name_font):
+        texto.font.name = name_font
     
     def mudar_tamanho(texto, px): 
         texto.font.size = Pt(px)
 
-    def criar_texto(paragrafo, texto, negrito = False, posicionamento = None, px = None):
+    def criar_texto(paragrafo, texto, negrito = False, posicionamento = None, px = None, fonte = None):
 
         def deixar_negrito(run): 
            run.bold = True 
@@ -22,12 +22,11 @@ class DocHelper:
                 paragrafo.alignment = WD_ALIGN_PARAGRAPH.RIGHT 
 
         run = paragrafo.add_run(texto)
-        
-        DocHelper.mudar_fonte(run)
 
         if (negrito): deixar_negrito(run)
         if (posicionamento != None): alinhar_texto(paragrafo, posicionamento)
         if (px != None): DocHelper.mudar_tamanho(run, px)
+        if (fonte != None): DocHelper.mudar_fonte(run, fonte)
 
     def encontrar_data_de_hoje_em_extenso():
         dicionario = {
@@ -54,7 +53,7 @@ class DocHelper:
         return f"BATAGUASSU/MS, {dia} de {mes} de {ano}"
 
     def adicionar_linha_de_assinatura(paragrafo, assinador): 
-        DocHelper.criar_texto(paragrafo, f"_____________________________\n{assinador}", negrito = True, posicionamento = "Centro")
+        DocHelper.criar_texto(paragrafo, f"_____________________________\n{assinador}", negrito = True, posicionamento = "Centro", fonte = "Cambria")
  
 
     def modificar_tabela(tabela, dados): 
@@ -66,7 +65,7 @@ class DocHelper:
             celula = tabela.cell(dado["celula"][0], dado["celula"][1])
             paragrafo = celula.paragraphs[0]  
 
-            DocHelper.criar_texto(paragrafo, dado["conteudo"], dado["negrito"], px = 10)
+            DocHelper.criar_texto(paragrafo, dado["conteudo"], dado["negrito"], px = 10, fonte = "Cambria")
 
         return tabela
          

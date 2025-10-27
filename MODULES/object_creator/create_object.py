@@ -76,7 +76,7 @@ class Termo:
         def adicionar_data():
             data = DocHelper.encontrar_data_de_hoje_em_extenso()
             paragrafo = doc.add_paragraph()
-            DocHelper.criar_texto(paragrafo, data, negrito=True, posicionamento = "Direita")
+            DocHelper.criar_texto(paragrafo, data, negrito=True, posicionamento = "Direita", fonte = "Cambria")
             pass 
 
         def adicionar_assinatura():
@@ -170,9 +170,9 @@ def capturar_info_planilha(localizacao_planilha):
             valor = SHEET["C12"].value
 
             if ("ATA" in localizacao_planilha):
-                gestor = "GESTOR DE ATA\nMURILO SOARES DE OLIVEIRA"
+                gestor = "MURILO SOARES DE OLIVEIRA\nGESTOR DE ATA"
             else: 
-                gestor = "GESTOR DE CONTRATO\nRONALDO DE SOUZA MARCILIO"
+                gestor = "RONALDO DE SOUZA MARCILIO\nGESTOR DE CONTRATO"
         
             novo_termo = Termo(contrato, contratado, objeto, af, mensagem, gestor)
             novo_termo.setRelatorioInfo(liquidacao, valor, data_liquidacao)
