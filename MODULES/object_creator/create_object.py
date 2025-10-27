@@ -34,7 +34,7 @@ class Termo:
             endereco_copia = os.getcwd() + rf"\{nome_arquivo}" + ".docx"
             Termo.index += 1 
         elif (arquivo == 'protocolo'): 
-            endereco_copia = os.getcwd() + f"\Protocolo N° {numero_protocolo} - Tesouraria.docx"
+            endereco_copia = os.getcwd() + rf"\Protocolo N° {numero_protocolo} - Tesouraria.docx"
         
         endereco_modelo = pegar_modelos(arquivo)
        
@@ -124,10 +124,12 @@ class Termo:
                 coluna_tres = nova_linha.cells[2].paragraphs[0]
                 coluna_quatro = nova_linha.cells[3].paragraphs[0]
                 
-                DocHelper.criar_texto(coluna_um, termos[i].contratado,  px = 8, negrito = True)
-                DocHelper.criar_texto(coluna_dois, termos[i].liquidacao,  px = 8, negrito = True)
-                DocHelper.criar_texto(coluna_tres, termos[i].data,  px = 8, negrito = True)
-                DocHelper.criar_texto(coluna_quatro, converter_currency(termos[i].valor),  px = 8, negrito = True)
+            
+                DocHelper.criar_texto(coluna_um, termos[i].contratado,  px = 8, negrito = True, fonte = "Arial")
+                DocHelper.criar_texto(coluna_dois, termos[i].liquidacao,  px = 8, negrito = True, fonte = "Arial")
+                DocHelper.criar_texto(coluna_tres, termos[i].data,  px = 8, negrito = True, fonte = "Arial")
+                DocHelper.criar_texto(coluna_quatro, converter_currency(termos[i].valor),  px = 8, negrito = True, fonte = "Arial")
+                
            
         adicionar_protocolo() 
         criar_tabela()
