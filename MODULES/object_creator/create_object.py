@@ -90,6 +90,7 @@ class Termo:
         adicionar_assinatura()
 
         doc.save(termo)
+        print(termo)
         Termo.salvar_pdf(termo[:-5])
         
     def salvar_pdf(docx):

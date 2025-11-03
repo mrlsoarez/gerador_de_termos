@@ -53,7 +53,7 @@ class DocHelper:
         return f"BATAGUASSU/MS, {dia} de {mes} de {ano}"
 
     def adicionar_linha_de_assinatura(paragrafo, assinador): 
-        DocHelper.criar_texto(paragrafo, f"_____________________________\n{assinador}", negrito = True, posicionamento = "Centro", fonte = "Cambria")
+        DocHelper.criar_texto(paragrafo, f"________________________________________\n{assinador}", negrito = True, posicionamento = "Centro", fonte = "Cambria")
  
 
     def modificar_tabela(tabela, dados): 
