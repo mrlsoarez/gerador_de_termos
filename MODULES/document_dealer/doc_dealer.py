@@ -44,13 +44,12 @@ class DocHelper:
                     "12": "DEZEMBRO"
                 }
                 
-        data = str(date.today())
+        data = str(date.today().strftime("%d/%m/%y"))
 
         dia = data[0] + data[1]
-        ano = data[:4]
-        mes = dicionario[f"{data[5]}{data[6]}"]
+        mes = dicionario[f"{data[3]}{data[4]}"]
 
-        return f"BATAGUASSU/MS, {dia} de {mes} de {ano}"
+        return f"BATAGUASSU/MS, {dia} de {mes} de 2025"
 
     def adicionar_linha_de_assinatura(paragrafo, assinador): 
         DocHelper.criar_texto(paragrafo, f"________________________________________\n{assinador}", negrito = True, posicionamento = "Centro", fonte = "Cambria")

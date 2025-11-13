@@ -2,11 +2,12 @@
 
 ROOT = r"C:\Users\Usuario\Documents\MURILO"
 TXT_PROTOCOLO = r"C:\Program Files (x86)\numero_protocolo\protocolo.txt"
+
 def pegar_endereco_base():
-    return rf"{ROOT}\3. ANÁLISES DE NOTAS FISCAIS\1. ANÁLISE MENSAL\11. NOVEMBRO
+    return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\ANÁLISE MENSAL\2025\11. NOVEMBRO"
   
 def pegar_planilha_termo(arquivo):
-    return rf"{ROOT}\3. ANÁLISES DE NOTAS FISCAIS\1. ANÁLISE MENSAL\INFO\{arquivo}"
+    return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\INFO\{arquivo}"
     
 def pegar_tipo_termo(prompt):
     if (prompt == "ata"):
@@ -36,6 +37,6 @@ def atualizar_numero_protocolo():
 
 def pegar_modelos(tipo):
     if (tipo == "termo"):
-        return rf"{ROOT}\3. ANÁLISES DE NOTAS FISCAIS\1. ANÁLISE MENSAL\MODELOS\MODELO DE TERMO.docx"
+        return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\MODELOS\MODELO DE TERMO.docx"
     elif (tipo == "protocolo"):
-        return rf"{ROOT}\3. ANÁLISES DE NOTAS FISCAIS\1. ANÁLISE MENSAL\MODELOS\MODELO DE PROTOCOLO.docx"
+        return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\MODELOS\MODELO DE PROTOCOLO.docx"
