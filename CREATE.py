@@ -67,7 +67,7 @@ def GERAR_TERMOS_E_PROTOCOLOS(tipo, mesmo_protocolo = False):
 
     Termo.criar_relatorio(TERMOS, NUMERO_ATUAL_PROTOCOLO, mesmo_protocolo)
    
-    #print("Relatório gerado! :)")
+    #print("Relatório gerado! :)"
 
 
 MAIN()

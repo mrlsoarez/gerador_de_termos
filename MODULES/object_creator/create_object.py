@@ -51,10 +51,8 @@ class Termo:
         def definir_tabela():
 
             tabela = doc.tables[0]
-             
-            if "credenciamento" in self.objeto.lower():
-                campo = "CREDENCIAMENTO N°"
-            elif tipo["corresponde_a"] == "ata":
+
+            if tipo["corresponde_a"] == "ata":
                 campo = "ATA N°"
             else:
                 campo = "CONTRATO N°" 
