@@ -157,7 +157,7 @@ def capturar_info_planilha(localizacao_planilha):
 
             SHEET = PLANILHA[nome]
 
-            if (SHEET["A4"].value == None): 
+            if (SHEET["A4"].value == None or SHEET ["A30"].value == "Sim"): 
                 continue 
              
             contrato = SHEET["E4"].value 
