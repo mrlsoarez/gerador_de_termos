@@ -1,5 +1,6 @@
 
 from openpyxl import load_workbook
+import win32api
 
 from docx import Document
 from docx2pdf import convert
@@ -12,9 +13,8 @@ import shutil
 
 class Termo:
 
-    index = 1 
-
-    def __init__(self, contrato, contratado, objeto, af, mensagem, gestor):
+    def __init__(self, ordem, contrato, contratado, objeto, af, mensagem, gestor):
+        self.ordem = ordem
         self.contratado = contratado 
         self.contrato = contrato 
         self.mensagem = mensagem
@@ -25,24 +25,30 @@ class Termo:
     def setRelatorioInfo(self, liquidacao, valor, data):
         self.liquidacao = liquidacao 
         self.valor = valor 
-        self.data = data 
+        self.data = data
+ 
+    def checar_se_arquivo_existe(self):
+        nome_arquivo = f'{self.ordem}. {self.contratado} - AF {self.af[:-3]}' + ".docx"
+        if (os.path.isfile(nome_arquivo)): return True 
 
     def copiar_arquivo(self, arquivo, numero_protocolo = None, mesmo_protocolo = False):
 
         if (arquivo == 'termo'): 
-            nome_arquivo = f'{Termo.index}. {self.contratado} - AF {self.af[:-4]}'
+            nome_arquivo = f'{self.ordem}. {self.contratado} - AF {self.af[:-3]}'
             endereco_copia = os.getcwd() + rf"\{nome_arquivo}" + ".docx"
-            Termo.index += 1 
+           
         elif (arquivo == 'protocolo'): 
             endereco_copia = os.getcwd() + rf"\Protocolo N° {numero_protocolo} - Tesouraria.docx"
         
         endereco_modelo = pegar_modelos(arquivo)
-       
+        print(endereco_copia, endereco_modelo)
         if (mesmo_protocolo == False): shutil.copy(endereco_modelo, endereco_copia)
 
         return endereco_copia
     
-    def criar_termo(self, tipo):
+    def criar_termo(self, tipo, impressao = False):
+
+        if (self.checar_se_arquivo_existe()): return 
         
         termo = self.copiar_arquivo("termo")
 
@@ -81,20 +87,40 @@ class Termo:
             paragrafo = doc.add_paragraph()
             DocHelper.adicionar_linha_de_assinatura(paragrafo, self.gestor)
 
+        def imprimir_termo(termo, arquivo):
+            pergunta = input(f"O termo --> {self.contratado} - AF {self.af} está pronto para ser impresso! Deseja imprimir? (Y/N).: ").lower()
+            print(termo, arquivo)
+            if (pergunta == "y"): 
+                file_path = arquivo
+            
+                win32api.ShellExecute(
+                    0,
+                    "print",
+                    file_path,
+                    None,
+                    ".",
+                    0
+                )
+                
+                print("Imprimindo... ", arquivo)
+            
         definir_tabela()
         adicionar_espaco()
         adicionar_data()
+  
         adicionar_espaco()
         adicionar_assinatura()
 
         doc.save(termo)
-        print(termo)
-        Termo.salvar_pdf(termo[:-5])
+        pdf = Termo.salvar_pdf(termo[:-5])
+
+        if (impressao): imprimir_termo(termo, pdf)
         
     def salvar_pdf(docx):
         pdf = docx.replace("WORD", "PDF") + ".pdf"
         docx = docx + ".docx"
         convert(docx, pdf)
+        return pdf         
 
     @staticmethod
     def criar_relatorio(termos, numero_protocolo, mesmo_protocolo):
@@ -123,7 +149,6 @@ class Termo:
                 coluna_tres = nova_linha.cells[2].paragraphs[0]
                 coluna_quatro = nova_linha.cells[3].paragraphs[0]
                 
-            
                 DocHelper.criar_texto(coluna_um, termos[i].contratado,  px = 8, negrito = True, fonte = "Arial")
                 DocHelper.criar_texto(coluna_dois, termos[i].liquidacao,  px = 8, negrito = True, fonte = "Arial")
                 DocHelper.criar_texto(coluna_tres, termos[i].data,  px = 8, negrito = True, fonte = "Arial")
@@ -138,9 +163,9 @@ class Termo:
         if ask_it == "y": atualizar_numero_protocolo()
         doc.save(protocolo)
 
-        pass 
+        print()
 
-def capturar_info_planilha(localizacao_planilha):
+def capturar_info_planilha(localizacao_planilha, numero_especifico = False):
 
     def formatar_data(objeto):
         return objeto.date().strftime("%d/%m/%Y")
@@ -155,11 +180,18 @@ def capturar_info_planilha(localizacao_planilha):
     for nome in PLANILHA.sheetnames: 
         if nome != "Base" and nome != "Fiscais":
 
-            SHEET = PLANILHA[nome]
+            if numero_especifico != False: 
+                try: 
+                    SHEET = PLANILHA[numero_especifico]
+                except: 
+                    pass  
+                numero_especifico = str(int(numero_especifico) + 1)
+            else: 
+                SHEET = PLANILHA[nome]
 
             if (SHEET["A4"].value == None or SHEET ["A30"].value == "Sim"): 
                 continue 
-             
+ 
             contrato = SHEET["E4"].value 
             contratado = SHEET["B4"].value
             mensagem = customizar_mensagem(str(SHEET["D16"].value))
@@ -175,7 +207,7 @@ def capturar_info_planilha(localizacao_planilha):
             else: 
                 gestor = "RONALDO DE SOUZA MARCILIO\nGESTOR DE CONTRATO"
         
-            novo_termo = Termo(contrato, contratado, objeto, af, mensagem, gestor)
+            novo_termo = Termo(nome, contrato, contratado, objeto, af, mensagem, gestor)
             novo_termo.setRelatorioInfo(liquidacao, valor, data_liquidacao)
 
             TERMOS.append(novo_termo)
