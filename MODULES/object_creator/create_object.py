@@ -13,13 +13,14 @@ import shutil
 
 class Termo:
 
+
     def __init__(self, ordem, contrato, contratado, objeto, af, mensagem, gestor):
         self.ordem = ordem
         self.contratado = contratado 
         self.contrato = contrato 
-        self.mensagem = mensagem
         self.objeto = objeto 
         self.af = af
+        self.mensagem = mensagem
         self.gestor = gestor 
 
     def setRelatorioInfo(self, liquidacao, valor, data):
@@ -41,7 +42,7 @@ class Termo:
             endereco_copia = os.getcwd() + rf"\Protocolo N° {numero_protocolo} - Tesouraria.docx"
         
         endereco_modelo = pegar_modelos(arquivo)
-        print(endereco_copia, endereco_modelo)
+        
         if (mesmo_protocolo == False): shutil.copy(endereco_modelo, endereco_copia)
 
         return endereco_copia
@@ -192,6 +193,7 @@ def capturar_info_planilha(localizacao_planilha, numero_especifico = False):
             if (SHEET["A4"].value == None or SHEET ["A30"].value == "Sim"): 
                 continue 
  
+            ordem = nome
             contrato = SHEET["E4"].value 
             contratado = SHEET["B4"].value
             mensagem = customizar_mensagem(str(SHEET["D16"].value))
@@ -207,7 +209,7 @@ def capturar_info_planilha(localizacao_planilha, numero_especifico = False):
             else: 
                 gestor = "RONALDO DE SOUZA MARCILIO\nGESTOR DE CONTRATO"
         
-            novo_termo = Termo(nome, contrato, contratado, objeto, af, mensagem, gestor)
+            novo_termo = Termo(ordem, contrato, contratado, objeto, af, mensagem, gestor)
             novo_termo.setRelatorioInfo(liquidacao, valor, data_liquidacao)
 
             TERMOS.append(novo_termo)

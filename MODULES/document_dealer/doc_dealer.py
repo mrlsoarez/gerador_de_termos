@@ -21,8 +21,8 @@ class DocHelper:
             elif (alinhado == "Direita"):
                 paragrafo.alignment = WD_ALIGN_PARAGRAPH.RIGHT 
 
-        run = paragrafo.add_run(texto)
-
+        run = paragrafo.add_run(str(texto))
+    
         if (negrito): deixar_negrito(run)
         if (posicionamento != None): alinhar_texto(paragrafo, posicionamento)
         if (px != None): DocHelper.mudar_tamanho(run, px)

@@ -179,7 +179,7 @@ def MAIN(tipo_documento, incremental):
 
             for index in range(len(termos)):
                 print(f"✧ *.✧ -> Criando o seguinte termo... {termos[index].contratado} - AF {termos[index].af} <-- ✧*.✧\n=======================================================================================")
-                #termos[index].criar_termo(tipo_termo, incremental)
+                termos[index].criar_termo(tipo_termo, incremental)
 
             if (incremental):
                 gerenciador.mover_planilhas()
