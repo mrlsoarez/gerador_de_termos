@@ -4,7 +4,7 @@ ROOT = r"C:\Users\Usuario\Documents\MURILO"
 TXT_PROTOCOLO = r"C:\Program Files (x86)\numero_protocolo\protocolo.txt"
 
 def pegar_endereco_base():
-    return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\ANÁLISE MENSAL\2025\12. DEZEMBRO"
+    return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\ANÁLISE MENSAL\2026\1. JANEIRO"
   
 def pegar_planilha_termo(arquivo):
     return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\INFO\{arquivo}"

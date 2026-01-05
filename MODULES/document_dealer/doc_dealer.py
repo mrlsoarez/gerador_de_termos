@@ -49,7 +49,7 @@ class DocHelper:
         dia = data[0] + data[1]
         mes = dicionario[f"{data[3]}{data[4]}"]
 
-        return f"BATAGUASSU/MS, {dia} de {mes} de 2025"
+        return f"BATAGUASSU/MS, {dia} de {mes} de 2026"
 
     def adicionar_linha_de_assinatura(paragrafo, assinador): 
         DocHelper.criar_texto(paragrafo, f"________________________________________\n{assinador}", negrito = True, posicionamento = "Centro", fonte = "Cambria")
