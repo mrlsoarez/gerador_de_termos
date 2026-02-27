@@ -1,10 +1,10 @@
 # Pasta onde ficará armazenado os termos, separados por datas
 
-ROOT = r"C:\Users\Usuario\Documents\MURILO"
+ROOT = r"C:\Users\Usuario\Documents\MRL"
 TXT_PROTOCOLO = r"C:\Program Files (x86)\numero_protocolo\protocolo.txt"
 
 def pegar_endereco_base():
-    return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\ANÁLISE MENSAL\2026\1. JANEIRO"
+    return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\ANÁLISE MENSAL\2026\2. FEVEREIRO"
   
 def pegar_planilha_termo(arquivo):
     return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\INFO\{arquivo}"
