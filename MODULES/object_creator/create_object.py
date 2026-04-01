@@ -207,7 +207,7 @@ def capturar_info_planilha(localizacao_planilha, numero_especifico = False):
             if ("ATA" in localizacao_planilha):
                 gestor = "MURILO SOARES DE OLIVEIRA\nGESTOR DE ATA"
             else: 
-                gestor = "RONALDO DE SOUZA MARCILIO\nGESTOR DE CONTRATO"
+                gestor = "MURILO SOARES DE OLIVEIRA\nSETOR DE CONTRATOS"
         
             novo_termo = Termo(ordem, contrato, contratado, objeto, af, mensagem, gestor)
             novo_termo.setRelatorioInfo(liquidacao, valor, data_liquidacao)
