@@ -1,37 +1,47 @@
-from openpyxl import load_workbook
 
-from docx.shared import Pt
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-from datetime import date
-from docx.shared import Inches
+from openpyxl import load_workbook
+import win32api
+
 from docx import Document
 from docx2pdf import convert
+from ENV.environment import pegar_modelos, atualizar_numero_protocolo
+from MODULES.document_dealer.doc_dealer import DocHelper
 
 import locale
 import os
+import shutil
 
 class Termo:
 
-    index = 1 
 
-    def __init__(self, contrato, contratado, objeto, af, mensagem, gestor):
+    def __init__(self, ordem, contrato, contratado, objeto, af, mensagem, gestor):
+        self.ordem = ordem
         self.contratado = contratado 
         self.contrato = contrato 
-        self.mensagem = mensagem
         self.objeto = objeto 
         self.af = af
+        self.mensagem = mensagem
         self.gestor = gestor 
 
     def setRelatorioInfo(self, liquidacao, valor, data):
-        self.contratado = self.contratado
         self.liquidacao = liquidacao 
         self.valor = valor 
-        self.data = data 
+        self.data = data
+ 
+    def checar_se_arquivo_existe(self):
+        nome_arquivo = f'{self.ordem}. {self.contratado} - AF {self.af[:-3]}' + ".docx"
+        if (os.path.isfile(nome_arquivo)): return True 
 
-    def criar_doc_termo(self, tipo):
+    def copiar_arquivo(self, arquivo, numero_protocolo = None, mesmo_protocolo = False):
 
-        doc = Document()
+        if (arquivo == 'termo'): 
+            nome_arquivo = f'{self.ordem}. {self.contratado} - AF {self.af[:-3]}'
+            endereco_copia = os.getcwd() + rf"\{nome_arquivo}" + ".docx"
+           
+        elif (arquivo == 'protocolo'): 
+            endereco_copia = os.getcwd() + rf"\Protocolo N° {numero_protocolo} - Tesouraria.docx"
         
+<<<<<<< HEAD
         def image_in_header(doc):
             section = doc.sections[0]
             header = section.header
@@ -45,97 +55,80 @@ class Termo:
             run.add_picture(r"C:\Users\Usuario\Pictures\HEADER.png", width=Inches(6)) 
       
         def criar_tabela(doc):
+=======
+        endereco_modelo = pegar_modelos(arquivo)
+        
+        if (mesmo_protocolo == False): shutil.copy(endereco_modelo, endereco_copia)
+>>>>>>> 827ff4f7627b016ba60278f1f653ff69c0369a12
 
-            tabela = doc.add_table(rows=6, cols=2)
-            tabela.style = "Table Grid"
-            celula = tabela.cell(0, 0).merge(tabela.cell(0, 1))
-            p = celula.paragraphs[0]
-            run = p.add_run("1- IDENTIFICAÇÃO")
-            run.bold = True
-            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        return endereco_copia
+    
+    def criar_termo(self, tipo, impressao = False):
 
-            if "credenciamento" in self.objeto.lower():
-                campo = "CREDENCIAMENTO N°"
-            elif tipo == "ata":
+        if (self.checar_se_arquivo_existe()): return 
+        
+        termo = self.copiar_arquivo("termo")
+
+        doc = Document(termo)
+
+        def definir_tabela():
+
+            tabela = doc.tables[0]
+
+            if tipo["corresponde_a"] == "ata":
                 campo = "ATA N°"
             else:
                 campo = "CONTRATO N°" 
 
-            campos = [campo, "CONTRATADO", "OBJETO", "AUTORIZAÇÃO DE FORNECIMENTO"]
-            for i, campo in enumerate(campos, start=1):
-                cell = tabela.cell(i, 0)
-                p = cell.paragraphs[0]
-                run = p.add_run(campo)
-                run.bold = True
 
-            tabela.cell(1, 1).text = self.contrato
-            tabela.cell(2, 1).text = self.contratado 
-            tabela.cell(3, 1).text = self.objeto
-            tabela.cell(4, 1).text = self.af
+            dados = [{"celula": (1, 0), "conteudo": campo, "negrito": True}, 
+                     {"celula": (1, 1), "conteudo": self.contrato, "negrito": False }, 
+                     {"celula": (2, 1), "conteudo": self.contratado, "negrito": False }, 
+                     {"celula": (3, 1), "conteudo": self.objeto, "negrito": False }, 
+                     {"celula": (4, 1), "conteudo": self.af, "negrito": False}, 
+                     {"celula": (6, 1), "conteudo": self.mensagem, "negrito": False }, 
+                    ]
 
-            cell = tabela.cell(5, 0).merge(tabela.cell(5, 1))
-            p = cell.paragraphs[0]
-            run = p.add_run("2- CUMPRIMENTO DAS OBRIGAÇÕES")
-            run.bold = True
-            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            # --- Linha 7: primeiro texto dentro da tabela (mesclar colunas) ---
-            cell = tabela.add_row().cells[0].merge(tabela.add_row().cells[1])
-            p = cell.paragraphs[0]
-            p.add_run(self.mensagem)
+            DocHelper.modificar_tabela(tabela, dados)
 
-            # --- Linha 8: segundo texto dentro da tabela (mesclar colunas) ---
-            cell = tabela.add_row().cells[0].merge(tabela.add_row().cells[1])
-            cell.text = (
-                "Constitui ainda eficácia liberatória de todas as obrigações estabelecidas em "
-                "contratado referentes ao objeto acima mencionado, exceto as garantias legais, "
-                "bem como autorizamos a restituição de todas as garantias e/ou caução prestadas."
-            )
-            
-        def criar_titulo(doc):
-          titulo = doc.add_paragraph("TERMO DE RECEBIMENTO DEFINITIVO")
-          titulo.alignment = WD_ALIGN_PARAGRAPH.CENTER
-          run = titulo.runs[0]
-          run.bold = True
-          run.font.size = Pt(14)
+        def adicionar_espaco():
+            doc.add_paragraph("")
         
-        def criar_data(doc):
+        def adicionar_data():
+            data = DocHelper.encontrar_data_de_hoje_em_extenso()
+            paragrafo = doc.add_paragraph()
+            DocHelper.criar_texto(paragrafo, data, negrito=True, posicionamento = "Direita", fonte = "Cambria")
+            pass 
 
-            def truncate_date():
+        def adicionar_assinatura():
+            paragrafo = doc.add_paragraph()
+            DocHelper.adicionar_linha_de_assinatura(paragrafo, self.gestor)
 
-                today = str(date.today())
+        def imprimir_termo(termo, arquivo):
+            pergunta = input(f"O termo --> {self.contratado} - AF {self.af} está pronto para ser impresso! Deseja imprimir? (Y/N).: ").lower()
+            print(termo, arquivo)
+            if (pergunta == "y"): 
+                file_path = arquivo
+            
+                win32api.ShellExecute(
+                    0,
+                    "print",
+                    file_path,
+                    None,
+                    ".",
+                    0
+                )
                 
-                def get_month(today):
-                    month = today[5] + today[6]
-                    months = {
-                    "01": "JANEIRO",
-                    "02": "FEVEREIRO",
-                    "03": "MARÇO",
-                    "04": "ABRIL",
-                    "05": "MAIO",
-                    "06": "JUNHO",
-                    "07": "JULHO",
-                    "08": "AGOSTO",
-                    "09": "SETEMBRO",
-                    "10": "OUTUBRO",
-                    "11": "NOVEMBRO",
-                    "12": "DEZEMBRO"
-                    }
-                    for keys in months:
-                        if keys == month:
-                            return months[keys]
-
-                month = get_month(today)        
-                string = "BATAGUASSU/MS, "
-                string += today[8:]  
-                string += f" de {month} de 2025."
-                return string
+                print("Imprimindo... ", arquivo)
             
-            text = truncate_date()
-            data = doc.add_paragraph(text)
-            data.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-            
-            truncate_date()
+        definir_tabela()
+        adicionar_espaco()
+        adicionar_data()
+  
+        adicionar_espaco()
+        adicionar_assinatura()
 
+<<<<<<< HEAD
         def criar_assinatura(doc):
             assinatura = doc.add_paragraph("_________________________________________")
             assinatura.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -187,136 +180,63 @@ class Termo:
         footer(doc)
 
         doc.save(nome_arquivo + ".docx")
-        
-        arquivo_docx = os.path.abspath(f"{nome_arquivo}")
-        Termo.salvar_pdf(arquivo_docx)
+=======
+        doc.save(termo)
+        pdf = Termo.salvar_pdf(termo[:-5])
 
-    
+        if (impressao): imprimir_termo(termo, pdf)
+>>>>>>> 827ff4f7627b016ba60278f1f653ff69c0369a12
+        
     def salvar_pdf(docx):
         pdf = docx.replace("WORD", "PDF") + ".pdf"
         docx = docx + ".docx"
         convert(docx, pdf)
-
+        return pdf         
 
     @staticmethod
-    def gerar_relatorio(termos, numero_protocolo):
-
-             # Update número de protocolo
-      def update_protocol():
-            fonte = r"C:\Program Files (x86)\numero_protocolo\protocolo.txt"
-            numero_atualizado = int(numero_protocolo) + 1
-            with open(fonte, "r+") as txt:
-                txt.write(str(numero_atualizado))
-       
-      # Deixar elemento em negrito
-      def make_it_bold(p):
-           run = p.runs[0]
-           run.bold = True 
-           return run 
-      
-      # Mudar tamanho de fonte
-      def change_font_size(p, px):
-          run = p.runs[0]
-          run.font.size = Pt(px)
-
-      #############################################################################
-      # -> Criando DOC
-
-      doc = Document()
-
-      def criar_cabeçalho(doc):
-
-        def image_in_header():
-            section = doc.sections[0]
-            header = section.header
-            run = header.paragraphs[0].add_run()
-            run.add_picture(r"C:\Users\Usuario\Pictures\HEADER.png")
-
-        image_in_header()
-
-        titulo_protocolo = doc.add_paragraph("SETOR DE CONTRATOS")
-        titulo_protocolo_numero = doc.add_paragraph(f"PROTOCOLO DE RECEBIMENTO - NUMERO {numero_protocolo}")
-      
-        make_it_bold(titulo_protocolo)
-        make_it_bold(titulo_protocolo_numero)
-      
-        doc.add_paragraph("__________________________________________________________________________________________")
-
-        mensagem_tesouraria_um = make_it_bold(doc.add_paragraph("Ao setor de Tesouraria, "))
-        mensagem_tesouraria_dois = doc.add_paragraph(f"Encaminhamos, por meio deste, as notas fiscais em anexo para as devidas providências quanto à análise e efetivação do pagamento. ")
-        mensagem_tesouraria_tres = make_it_bold(doc.add_paragraph("Relação dos documentos: "))
-
-      def criar_tabela(doc):
+    def criar_relatorio(termos, numero_protocolo, mesmo_protocolo):
+        
+        protocolo = Termo.copiar_arquivo(None, "protocolo", numero_protocolo, mesmo_protocolo)
+        doc = Document(protocolo)
 
         def converter_currency(valor):
             locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
             return locale.currency(float(valor), grouping =True)
-
-        table = doc.add_table(rows = len(termos) + 1, cols = 4)
-        table.style = "Table Grid"
-        table.autofit = "False"
-
-        # TABELA COLUNA PADRÃO
-        campos = ["EMPRESA", "N° DE LIQUIDAÇÃO", "DATA", "VALOR"]
-        for i in range(0, 4):
-           cell = table.cell(0, i)  
-           if i == 0: cell.width = Inches(5)
-           p = cell.paragraphs[0]
-           run = p.add_run(campos[i])
-           run.bold = True
-           change_font_size(cell.paragraphs[0], 9)
-
-        #TABELA COLUNA DINÂMICA
-       
-        for i in range(0, len(termos)):
-          for q in range(0, 4):  
-            if q == 0: table.cell(i+1, q).text = termos[i].contratado
-            elif q == 1: table.cell(i+1, q).text = termos[i].liquidacao
-            elif q == 2: table.cell(i+1, q).text = termos[i].data
-            elif q == 3: table.cell(i+1, q).text = converter_currency(termos[i].valor)
-            cell = table.cell(i+1, q) 
-            change_font_size(cell.paragraphs[0], 9)
-          
-      def adicionar_paragrafo(doc):
-        doc.add_paragraph("")
-    
-      def mensagem_tesouraria(doc):
-        mensagem_tesouraria_quatro = make_it_bold(doc.add_paragraph("Atenciosamente, "))
-      
-      def criar_assinaturas(doc):
-        assinatura_murilo = doc.add_paragraph("_________________________________________")
-        assinatura_murilo.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        murilo = doc.add_paragraph("MURILO SOARES DE OLIVEIRA \n SETOR DE CONTRATOS")
-        murilo.alignment = WD_ALIGN_PARAGRAPH.CENTER
-     
-        doc.add_paragraph("")
-        doc.add_paragraph("DATA DE ASSINATURA: Bataguassu/MS ____ do _____ de 2025")
-        doc.add_paragraph("")
-
-        assinatura_tesouraria = doc.add_paragraph("_________________________________________")
-        assinatura_tesouraria.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        tesouraria = doc.add_paragraph("ASSINATURA DE RECEBIMENTO \n SETOR DE TESOURARIA")
-        tesouraria.alignment = WD_ALIGN_PARAGRAPH.CENTER
         
-        make_it_bold(murilo)
-        make_it_bold(tesouraria)
+        def adicionar_protocolo():
+            substituir_protocolo = doc.paragraphs[1]
+            substituir_protocolo.text = ""
+            DocHelper.criar_texto(substituir_protocolo, f"PROTOCOLO DE RECEBIMENTO - NÚMERO {numero_protocolo}", negrito = True)
+   
+        def criar_tabela():
+            
+            tabela = doc.tables[0]
+            for i in range(len(termos)):
+                
+                nova_linha = tabela.add_row()
+            
+                coluna_um = nova_linha.cells[0].paragraphs[0]
+                coluna_dois = nova_linha.cells[1].paragraphs[0]
+                coluna_tres = nova_linha.cells[2].paragraphs[0]
+                coluna_quatro = nova_linha.cells[3].paragraphs[0]
+                
+                DocHelper.criar_texto(coluna_um, termos[i].contratado,  px = 8, negrito = True, fonte = "Arial")
+                DocHelper.criar_texto(coluna_dois, termos[i].liquidacao,  px = 8, negrito = True, fonte = "Arial")
+                DocHelper.criar_texto(coluna_tres, termos[i].data,  px = 8, negrito = True, fonte = "Arial")
+                DocHelper.criar_texto(coluna_quatro, converter_currency(termos[i].valor),  px = 8, negrito = True, fonte = "Arial")
+                
+           
+        adicionar_protocolo() 
+        criar_tabela()
 
-      criar_cabeçalho(doc)
-      criar_tabela(doc)
-      adicionar_paragrafo(doc)
-      mensagem_tesouraria(doc)
-      criar_assinaturas(doc)
-      
-      nome_arquivo = f"Protocolo N° {numero_protocolo} - Tesouraria"
-      doc.save(f"{nome_arquivo}.docx")
-      
-      ask_it = str(input("Atualizar o protocolo? (Y/N) --> ")).lower()
+        ask_it = str(input("Atualizar o protocolo? (Y/N) --> ")).lower()
 
-      if ask_it == "y": update_protocol()
+        if ask_it == "y": atualizar_numero_protocolo()
+        doc.save(protocolo)
 
-      
-    
-def capturar_info_planilha(localizacao_planilha):
+        print()
+
+def capturar_info_planilha(localizacao_planilha, numero_especifico = False):
 
     def formatar_data(objeto):
         return objeto.date().strftime("%d/%m/%Y")
@@ -331,11 +251,19 @@ def capturar_info_planilha(localizacao_planilha):
     for nome in PLANILHA.sheetnames: 
         if nome != "Base" and nome != "Fiscais":
 
-            SHEET = PLANILHA[nome]
+            if numero_especifico != False: 
+                try: 
+                    SHEET = PLANILHA[numero_especifico]
+                except: 
+                    pass  
+                numero_especifico = str(int(numero_especifico) + 1)
+            else: 
+                SHEET = PLANILHA[nome]
 
-            if (SHEET["A4"].value == None): 
+            if (SHEET["A4"].value == None or SHEET ["A30"].value == "Sim"): 
                 continue 
-             
+ 
+            ordem = nome
             contrato = SHEET["E4"].value 
             contratado = SHEET["B4"].value
             mensagem = customizar_mensagem(str(SHEET["D16"].value))
@@ -347,11 +275,11 @@ def capturar_info_planilha(localizacao_planilha):
             valor = SHEET["C12"].value
 
             if ("ATA" in localizacao_planilha):
-                gestor = "GESTOR DE ATA\nMURILO SOARES DE OLIVEIRA"
+                gestor = "MURILO SOARES DE OLIVEIRA\nGESTOR DE ATA"
             else: 
-                gestor = "GESTOR DE CONTRATO\nRONALDO DE SOUZA MARCILIO"
+                gestor = "RONALDO DE SOUZA MARCILIO\nSETOR DE CONTRATOS"
         
-            novo_termo = Termo(contrato, contratado, objeto, af, mensagem, gestor)
+            novo_termo = Termo(ordem, contrato, contratado, objeto, af, mensagem, gestor)
             novo_termo.setRelatorioInfo(liquidacao, valor, data_liquidacao)
 
             TERMOS.append(novo_termo)
