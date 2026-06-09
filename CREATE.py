@@ -130,6 +130,7 @@ class GerenciadorDePasta:
 
     def mover_planilhas(self): 
         shutil.copyfile(self.planilha_original, self.planilha_copiada)
+    
 
 
 gerenciador = GerenciadorDePasta()

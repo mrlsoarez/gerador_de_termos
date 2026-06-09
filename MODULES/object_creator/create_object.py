@@ -48,7 +48,7 @@ class Termo:
         return endereco_copia
     
     def criar_termo(self, tipo, impressao = False):
-
+        
         if (self.checar_se_arquivo_existe()): return 
         
         termo = self.copiar_arquivo("termo")
