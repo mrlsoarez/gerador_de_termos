@@ -117,6 +117,7 @@ def MENU():
 
 MENU()
 """
+"""
 
 class GerenciadorDePasta:
 
@@ -218,3 +219,5 @@ def MENU():
     MAIN(TIPO_DE_DOCUMENTO, incremental)
 
 MENU()
+
+"""
