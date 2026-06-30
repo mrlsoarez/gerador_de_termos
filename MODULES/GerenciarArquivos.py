@@ -17,7 +17,6 @@ class GerenciarArquivos:
         if(navegar): os.chdir(nome_pasta)
 
     def entrar_na_pasta(self, nome_pasta):
-        print("hi", nome_pasta, self.pasta_atual)
         os.chdir(nome_pasta)
         self.pasta_atual = rf"{self.pasta_atual}\{nome_pasta}"
         

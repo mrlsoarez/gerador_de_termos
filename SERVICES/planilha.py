@@ -105,6 +105,7 @@ def INICIAR_PLANILHA(localizacao_planilha, gerenciador_arquivos):
                 PROCESSAR_ARQUIVO(localizacao_planilha, gerenciador_arquivos)
                 modified = os.path.getmtime(localizacao_planilha)
                 modified = datetime.fromtimestamp(modified)
+                gerenciador_arquivos.entrar_na_pasta("..")
                 
     except KeyboardInterrupt:
         print("Encerrando...")
