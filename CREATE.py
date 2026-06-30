@@ -22,11 +22,6 @@ class CriadorDePastas:
     def mover_planilhas(original, copiada): 
         shutil.copyfile(original, copiada)
 
-
-
-
-
-
 def MAIN(incremental = False):
 
     PASTA_BASE = pegar_endereco_base()
