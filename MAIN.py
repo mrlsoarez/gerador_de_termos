@@ -1,6 +1,6 @@
 from ENV.environment import pegar_endereco_base, pegar_tipo_termo, pegar_planilha_termo, pegar_numero_protocolo
 from SERVICES.planilha import COLETAR_DADOS_EXTERNOS, ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS, INICIAR_PLANILHA
-
+from MODULES.GerenciarArquivos import GerenciarArquivos
 
 # lista de dependencias sao elas
 #win32
@@ -8,6 +8,7 @@ from SERVICES.planilha import COLETAR_DADOS_EXTERNOS, ATUALIZAR_PLANILHA_COM_DAD
 #openpyxl
 #pandas -- xlrd
 r"""
+
 import win32com.client
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -16,7 +17,6 @@ from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 import os
 from openpyxl import load_workbook
-
 import time
 from ENV.environment import pegar_endereco_base, pegar_tipo_termo, pegar_planilha_termo, pegar_numero_protocolo
 
@@ -119,6 +119,10 @@ ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS()
 
 """
 
+"""
+///***********//////////
+"""
+
 
 def MAIN():
     
@@ -137,15 +141,16 @@ def MAIN():
     pergunta_update = "s"
 
     PASTA_PLANILHA_ANALISE = pegar_planilha_termo(pegar_tipo_termo(pergunta_inicial))
-
+    GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base())
+    GERENCIADOR_PASTAS.criar_pasta_datas()
     # cerca de 1 min pra rodar (motivo: esperar o download terminar)
     if (pergunta_update == "s"): 
-        COLETAR_DADOS_EXTERNOS("return ProcessaDados('lnkDespesasPor_NotaEmpenho');", "http://bataguassums.biosnet.com.br:8079/transparencia/DespesasPorEntidade.aspx")
-        COLETAR_DADOS_EXTERNOS("return ProcessaDados('lnkDespesasLiquidadas');", "http://bataguassums.biosnet.com.br:8079/transparencia/DespesasLiquidadas.aspx")
-        ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE)
+        #COLETAR_DADOS_EXTERNOS("return ProcessaDados('lnkDespesasPor_NotaEmpenho');", "http://bataguassums.biosnet.com.br:8079/transparencia/DespesasPorEntidade.aspx")
+        #COLETAR_DADOS_EXTERNOS("return ProcessaDados('lnkDespesasLiquidadas');", "http://bataguassums.biosnet.com.br:8079/transparencia/DespesasLiquidadas.aspx")
+        #ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE)
+        pass
 
-    INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE)
-
+    #INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE)
 
 def CAPTURAR_RESPOSTA(mensagem, dado_esperado):
 

@@ -6,6 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 import os
 import time
+from datetime import datetime
 from openpyxl import load_workbook
 
 def COLETAR_DADOS_EXTERNOS(direcao, link):
@@ -17,7 +18,7 @@ def COLETAR_DADOS_EXTERNOS(direcao, link):
         driver.get("http://bataguassums.biosnet.com.br:8079/transparencia/")
 
         # aguarda a página carregar
-        WebDriverWait(driver, 20).until(
+        WebDriverWait(driver, 10).until(
             lambda d: d.execute_script("return document.readyState") == "complete"
         )
 
@@ -26,22 +27,22 @@ def COLETAR_DADOS_EXTERNOS(direcao, link):
 
         driver.get(link)
         
-        WebDriverWait(driver, 20).until(
+        WebDriverWait(driver, 10).until(
             lambda d: d.execute_script("return document.readyState") == "complete"
         )
         # procura o botão
-        botao = WebDriverWait(driver, 50).until(
+        botao = WebDriverWait(driver, 25).until(
             EC.element_to_be_clickable((By.ID, "btnExportarXLS"))
         )
 
         botao.click()
-        time.sleep(15)
+        time.sleep(10)
     except:
         print(f"Não foi possível capturar a planilha referente a... {link}. Permanecendo com os dados anteriores.")
 
 def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(localizacao_planilha):
     
-    pasta = r"C:\Users\mrl\Downloads"
+    pasta = r"C:\Users\Usuario\Downloads"
 
     def converter_para_xlsx(arquivo):
         arquivo_xls = arquivo
@@ -86,14 +87,22 @@ def INICIAR_PLANILHA(localizacao_planilha):
     excel.Visible = True
 
     wb = excel.Workbooks.Open(localizacao_planilha)
-
-    print("Ouvindo planilha... aperte qualquer botão para encerrar e fechar a planilha.")
-
+    
+    modified = os.path.getmtime(localizacao_planilha)
+    modified = datetime.fromtimestamp(modified)
+    
     try:
         while True:
             time.sleep(1)
+            last_modified = os.path.getmtime(localizacao_planilha)
+            last_modified = datetime.fromtimestamp(last_modified)
+            if (last_modified > modified):
+                # aqui começa a criar o termo, op assincrona?
+                modified = os.path.getmtime(localizacao_planilha)
+                modified = datetime.fromtimestamp(modified)
+                
     except KeyboardInterrupt:
         print("Encerrando...")
     finally:
-        wb.Close(SaveChanges=True)  # fecha a planilha
-        excel.Quit()                 # fecha o Excel
+        wb.Close(SaveChanges=True)  
+        excel.Quit()               

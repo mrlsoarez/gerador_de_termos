@@ -10,6 +10,7 @@ from MODULES.document_dealer.doc_dealer import DocHelper
 import locale
 import os
 import shutil
+"""
 
 class Termo:
 
@@ -41,7 +42,6 @@ class Termo:
         elif (arquivo == 'protocolo'): 
             endereco_copia = os.getcwd() + rf"\Protocolo N° {numero_protocolo} - Tesouraria.docx"
         
-<<<<<<< HEAD
         def image_in_header(doc):
             section = doc.sections[0]
             header = section.header
@@ -55,11 +55,6 @@ class Termo:
             run.add_picture(r"C:\Users\Usuario\Pictures\HEADER.png", width=Inches(6)) 
       
         def criar_tabela(doc):
-=======
-        endereco_modelo = pegar_modelos(arquivo)
-        
-        if (mesmo_protocolo == False): shutil.copy(endereco_modelo, endereco_copia)
->>>>>>> 827ff4f7627b016ba60278f1f653ff69c0369a12
 
         return endereco_copia
     
@@ -128,7 +123,6 @@ class Termo:
         adicionar_espaco()
         adicionar_assinatura()
 
-<<<<<<< HEAD
         def criar_assinatura(doc):
             assinatura = doc.add_paragraph("_________________________________________")
             assinatura.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -180,12 +174,6 @@ class Termo:
         footer(doc)
 
         doc.save(nome_arquivo + ".docx")
-=======
-        doc.save(termo)
-        pdf = Termo.salvar_pdf(termo[:-5])
-
-        if (impressao): imprimir_termo(termo, pdf)
->>>>>>> 827ff4f7627b016ba60278f1f653ff69c0369a12
         
     def salvar_pdf(docx):
         pdf = docx.replace("WORD", "PDF") + ".pdf"
@@ -285,3 +273,4 @@ def capturar_info_planilha(localizacao_planilha, numero_especifico = False):
             TERMOS.append(novo_termo)
 
     return TERMOS
+"""

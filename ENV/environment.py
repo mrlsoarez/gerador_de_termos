@@ -1,21 +1,18 @@
 # Pasta onde ficará armazenado os termos, separados por datas
 
-#ROOT = r"C:\Users\Usuario\Documents\MRL"
-ROOT = r"C:\Users\mrl\Documents"
+ROOT = r"C:\Users\Usuario\Documents\MRL"
 TXT_PROTOCOLO = r"C:\Program Files (x86)\numero_protocolo\protocolo.txt"
 
 def pegar_endereco_base():
-    return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\ANÁLISE MENSAL\2026\6. JUNHO"
+    return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\ANÁLISE MENSAL\2026"
   
 def pegar_planilha_termo(arquivo):
-    return rf"{ROOT}\teste\{arquivo}"
-    #return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\INFO\{arquivo}"
+    return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\INFO\{arquivo}"
     
 def pegar_tipo_termo(prompt):
     if (prompt == "2"): return "ANÁLISE FISCAL - ATA.xlsx"
     return "ANÁLISE FISCAL.xlsx"
            
-    
 def pegar_numero_protocolo():
     fonte = TXT_PROTOCOLO
     string = ""
