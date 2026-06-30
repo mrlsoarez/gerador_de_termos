@@ -41,9 +41,25 @@ class Termo:
         elif (arquivo == 'protocolo'): 
             endereco_copia = os.getcwd() + rf"\Protocolo N° {numero_protocolo} - Tesouraria.docx"
         
+<<<<<<< HEAD
+        def image_in_header(doc):
+            section = doc.sections[0]
+            header = section.header
+            
+            header.paragraphs[0].clear()
+
+            paragraph = header.add_paragraph()
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER  
+
+            run = paragraph.add_run()
+            run.add_picture(r"C:\Users\Usuario\Pictures\HEADER.png", width=Inches(6)) 
+      
+        def criar_tabela(doc):
+=======
         endereco_modelo = pegar_modelos(arquivo)
         
         if (mesmo_protocolo == False): shutil.copy(endereco_modelo, endereco_copia)
+>>>>>>> 827ff4f7627b016ba60278f1f653ff69c0369a12
 
         return endereco_copia
     
@@ -112,10 +128,64 @@ class Termo:
         adicionar_espaco()
         adicionar_assinatura()
 
+<<<<<<< HEAD
+        def criar_assinatura(doc):
+            assinatura = doc.add_paragraph("_________________________________________")
+            assinatura.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            gestor = doc.add_paragraph(self.gestor)
+            gestor.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            run = gestor.runs[0]
+            run.bold = True
+        
+        def footer(doc):
+            section = doc.sections[0]
+            footer = section.footer
+
+    
+            footer.paragraphs[0].clear()
+
+    
+            paragraph_img = footer.add_paragraph()
+            paragraph_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            run_img = paragraph_img.add_run()
+            run_img.add_picture(r"C:\Users\Usuario\Pictures\LINHA.png", width=Inches(6))
+
+            paragraph_text = footer.add_paragraph()
+            paragraph_text.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+            run_text = paragraph_text.add_run(
+                "Avenida Aquidauana, Nº 1001 - Centro | Fone: (67) 3541-5100\n"
+                "CEP 79.780-000 | CNPJ 03.576.220/0001-56\n"
+                "www.bataguassu.ms.gov.br | gabinete@bataguassu.ms.gov.br"
+            )
+
+            # Optional formatting
+            font = run_text.font
+            font.size = Pt(8)
+            font.name = "Arial"
+        
+        
+            
+        nome_arquivo = f"{Termo.index}. {self.contratado} - AF {self.af[:4]}"
+        Termo.index += 1
+
+        image_in_header(doc)
+        criar_titulo(doc)
+        doc.add_paragraph("")
+        criar_tabela(doc)
+        doc.add_paragraph("")
+        criar_data(doc)
+        doc.add_paragraph("") 
+        criar_assinatura(doc)
+        footer(doc)
+
+        doc.save(nome_arquivo + ".docx")
+=======
         doc.save(termo)
         pdf = Termo.salvar_pdf(termo[:-5])
 
         if (impressao): imprimir_termo(termo, pdf)
+>>>>>>> 827ff4f7627b016ba60278f1f653ff69c0369a12
         
     def salvar_pdf(docx):
         pdf = docx.replace("WORD", "PDF") + ".pdf"
