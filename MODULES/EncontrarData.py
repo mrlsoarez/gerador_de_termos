@@ -39,4 +39,3 @@ def EncontrarData(parametro, *args):
     elif (parametro == "ano"):
         return PegarAno(data)
     
-print(EncontrarData("ano", False))

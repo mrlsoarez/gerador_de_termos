@@ -1,13 +1,18 @@
+
 import win32com.client
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from SERVICES.ARQUIVO import PROCESSAR_ARQUIVO
 import pandas as pd
 import os
 import time
+
 from datetime import datetime
 from openpyxl import load_workbook
+
+
 
 def COLETAR_DADOS_EXTERNOS(direcao, link):
 
@@ -81,7 +86,7 @@ def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(localizacao_planilha):
     else:
         ANALISE_FISCAL.save(localizacao_planilha)
 
-def INICIAR_PLANILHA(localizacao_planilha):
+def INICIAR_PLANILHA(localizacao_planilha, gerenciador_arquivos):
 
     excel = win32com.client.Dispatch("Excel.Application")
     excel.Visible = True
@@ -90,7 +95,6 @@ def INICIAR_PLANILHA(localizacao_planilha):
     
     modified = os.path.getmtime(localizacao_planilha)
     modified = datetime.fromtimestamp(modified)
-    
     try:
         while True:
             time.sleep(1)
@@ -98,6 +102,7 @@ def INICIAR_PLANILHA(localizacao_planilha):
             last_modified = datetime.fromtimestamp(last_modified)
             if (last_modified > modified):
                 # aqui começa a criar o termo, op assincrona?
+                PROCESSAR_ARQUIVO(localizacao_planilha, gerenciador_arquivos)
                 modified = os.path.getmtime(localizacao_planilha)
                 modified = datetime.fromtimestamp(modified)
                 
