@@ -1,49 +1,15 @@
 
 import win32com.client
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+
 from SERVICES.ARQUIVO import PROCESSAR_ARQUIVO
 import pandas as pd
 import os
-import time
 
 from datetime import datetime
 from openpyxl import load_workbook
+import time
 
-
-
-def COLETAR_DADOS_EXTERNOS(direcao, link):
-
-    try: 
-        driver = webdriver.Chrome()
-
-        # entra na raiz do sistema
-        driver.get("http://bataguassums.biosnet.com.br:8079/transparencia/")
-
-        # aguarda a página carregar
-        WebDriverWait(driver, 10).until(
-            lambda d: d.execute_script("return document.readyState") == "complete"
-        )
-
-        # agora navega para despesas
-        driver.execute_script(direcao)
-
-        driver.get(link)
-        
-        WebDriverWait(driver, 10).until(
-            lambda d: d.execute_script("return document.readyState") == "complete"
-        )
-        # procura o botão
-        botao = WebDriverWait(driver, 25).until(
-            EC.element_to_be_clickable((By.ID, "btnExportarXLS"))
-        )
-
-        botao.click()
-        time.sleep(10)
-    except:
-        print(f"Não foi possível capturar a planilha referente a... {link}. Permanecendo com os dados anteriores.")
+# Funções referentes a planilha
 
 def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(localizacao_planilha):
     

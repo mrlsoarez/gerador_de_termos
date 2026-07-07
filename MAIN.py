@@ -1,7 +1,8 @@
 from ENV.environment import pegar_endereco_base, pegar_tipo_termo, pegar_planilha_termo, pegar_numero_protocolo
-from SERVICES.PLANILHA import COLETAR_DADOS_EXTERNOS, ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS, INICIAR_PLANILHA
-
+from SERVICES.PLANILHA import ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS, INICIAR_PLANILHA
+from SERVICES.DADOS_EXTERNOS import COLETAR_DADOS_EXTERNOS
 from MODULES.GerenciarArquivos import GerenciarArquivos
+
 
 # lista de dependencias sao elas
 #win32
@@ -138,6 +139,14 @@ def MAIN():
         "Deseja atualizar os dados da planilha? (S/N) -> ", ("s", "n")
     )
     """
+    
+    
+    # A coleta de dados externos oferece uma estrutura que envolve
+        # -> Atualização da planilha contrato com dados atualizados dos contratos
+            # -> Inclusão dos empenhos e liquidações atualizadas
+            # -> Inclusão dos servidores
+        ## Futuramente, inclusão de JSON com os dados de ata
+        
     pergunta_inicial = "2"
     pergunta_update = "s"
 

@@ -12,17 +12,17 @@ class GerenciarArquivos:
         self.pasta_base = pasta_base
         self.tipo_arquivo = tipo_arquivo
         
-    def criar_pasta(self, nome_pasta, navegar = False):
+    def criarPasta(self, nome_pasta, navegar = False):
         os.makedirs(nome_pasta, exist_ok = "True")
         if(navegar): os.chdir(nome_pasta)
 
-    def entrar_na_pasta(self, nome_pasta):
+    def entrarEmPasta(self, nome_pasta):
         os.chdir(nome_pasta)
         self.pasta_atual = rf"{self.pasta_atual}\{nome_pasta}"
         
-    def verificar_arquivo(self, arq):
+    def verificarArquivo(self, arq):
         return os.path.exists(rf"{self.pasta_atual}/{arq}")
-    
+    #### precisa sair daqui
     def criar_pasta_termos(self):
         
         mes_numero = EncontrarData("mes", False)
