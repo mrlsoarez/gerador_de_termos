@@ -4,45 +4,50 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time 
 
-URL = "http://bataguassums.biosnet.com.br:8079/transparencia/"
+import requests
+from openpyxl import load_workbook
 
-def COLETAR_DADOS_EXTERNOS(direcao, link, tipo):
+from ENV.environment import pegar_pasta_downloads
 
-    if tipo == "MODO_WEB":
-        try: 
-            driver = webdriver.Chrome()
+# Aqui os dados são buscados de fontes externas, seja através de requisição por API ou por acesso automatizado ao site. 
+# Os dados (planilha bruta ou JSON) retornam para o serviço MAIN que redireciona para as planilhas, que irá substituir os dados nas planilhas conforme necessário.
 
-            # entra na raiz do sistema
-            driver.get("http://bataguassums.biosnet.com.br:8079/transparencia/")
+URL = "http://bataguassums.biosnet.com.br:8079"
 
-            # aguarda a página carregar
-            WebDriverWait(driver, 10).until(
-                lambda d: d.execute_script("return document.readyState") == "complete"
-            )
+## 1. to do:
 
-            # agora navega para despesas
-            driver.execute_script(direcao)
+    # criar modulo para converter xls para xlsx
+    # ler a planilha de liquidaçao e voltar com um json util
+    
+def COLETAR_DADOS_EXTERNOS(tipo):
 
-            driver.get(link)
-            
-            WebDriverWait(driver, 10).until(
-                lambda d: d.execute_script("return document.readyState") == "complete"
-            )
-            # procura o botão
-            botao = WebDriverWait(driver, 25).until(
-                EC.element_to_be_clickable((By.ID, "btnExportarXLS"))
-            )
-
-            botao.click()
-            time.sleep(10)
-        except:
-            print(f"Não foi possível capturar a planilha referente a... {link}. Permanecendo com os dados anteriores.")
-    elif tipo == "MODO_JSON": 
-        pass 
-
-def COLETAR_DADOS_EXTERNOS_JSON():
+    def get_liquidacoes():
+        return {"url": rf"{URL}/transparencia/DespesasLiquidadas.aspx",
+                "botao": rf"return ProcessaDados('lnkDespesasLiquidadas')",
+                "planilha_link": "Portal Transp. Despesas Liquidadas.xls"}
+    
+    def get_servidores():
+        return { "url": rf"{URL}/transparencia/VersaoJson/Pessoal/",
+                "json": {
+                    "ConectarExercicio": "2026",
+                    "Listagem": "Servidores",
+                    "Ano": "2026",
+                    "Empresa": "1",
+                    "MostraDadosConsolidado": "True",
+                    "MesFinalPeriodo": "01",
+                    },   
+                "dados_para_planilha": {
+                    "Nome": "NOME", 
+                    "Matricula": "ID",
+                    "Unidade": "DIVISAO",
+                    "Cargo": "CARGO",
+                    "Vinculo": "VINCULO",
+                }
+            }   
+         
     def get_contratos(): 
-        return { "parametros": {
+        return { "url": rf"{URL}/transparencia/VersaoJson/LicitacoesEContratos/",
+                "json": {
                     "ConectarExercicio": "2026",
                     "Listagem": "Contratos",
                     "Ano": "2026",
@@ -61,49 +66,146 @@ def COLETAR_DADOS_EXTERNOS_JSON():
                     "Vigência": "VIGENF",
                     "Fiscais": "RESPON"
                 },
-                "tipo": "contratos"
             }
+    
+    def get_empenhos():
+        return  { "url": rf"{URL}/transparencia/VersaoJson/Despesas/", 
+                "json": {
+                "ConectarExercicio": "2026",
+                "Listagem": "DespesasGerais",
+                "DiaInicioPeriodo": "01",
+                "MesInicialPeriodo": "01",
+                "DiaFinalPeriodo": "31",
+                "MesFinalPeriodo": "12",
+                "Ano": "2026",
+                "Empresa": "1",
+                "MostrarFornecedor": "True",
+                "MostraDadosConsolidado": "False",
+                "UFParaFiltroCOVID": "",
+                "MostrarCNPJFornecedor": "True",
+                "ApenasIDEmpenho": "False",
+                }, 
+                "dados_para_planilha": {
+                    "Fornecedor": "NOMEFOR",
+                    "Codigo": "CODIGO",
+                    "Tipo_Empenho": "TPEM",
+                    "Data": "DATAE",
+                    "Projeto_Atividade": "PROJETO_ATIVIDADE_NOME",
+                    "Programa": "PROGRAMANOME",
+                    "Ficha": "FICHA",
+                    "Fonte": "FONTE_STN",
+                }
+            }
+    
+    """
+    
+    if tipo == "MODO_WEB":
+        try: 
+            driver = webdriver.Chrome()
 
-    C = "/transparencia/VersaoJson/LicitacoesEContratos/"
-import requests
-from openpyxl import load_workbook
+            # entra na raiz do sistema
+            driver.get("http://bataguassums.biosnet.com.br:8079/transparencia/")
 
+            # aguarda a página carregar
+            WebDriverWait(driver, 10).until(
+                lambda d: d.execute_script("return document.readyState") == "complete"
+            )
 
-session = requests.Session()
+            # agora navega para despesas
+            driver.execute_script(direcao)
+            driver.get(link)
+            
+            WebDriverWait(driver, 10).until(
+                lambda d: d.execute_script("return document.readyState") == "complete"
+            )
+            # procura o botão
+            botao = WebDriverWait(driver, 25).until(
+                EC.element_to_be_clickable((By.ID, "btnExportarXLS"))
+            )
 
-session.get("")
+            botao.click()
+            time.sleep(10)
+        except:
+            print(f"Não foi possível capturar a planilha referente a... {link}. Permanecendo com os dados anteriores.")
+    """
+    
+    if (tipo == "liquidacoes"):
+        COLETAR_DADOS_EXTERNOS_XLSX(get_liquidacoes())
+    elif (tipo == "contratos"):
+        return COLETAR_DADOS_EXTERNOS_JSON(get_contratos())
+    elif (tipo == "empenhos"):
+        return COLETAR_DADOS_EXTERNOS_JSON(get_empenhos())
+    elif (tipo == "servidores"):
+        return COLETAR_DADOS_EXTERNOS_JSON(get_servidores())
 
-
-def buscar_dados(url, json):
-    response = session.get(url, params=json["parametros"])
-    dados = response.json()
-    dados_tratados = realizar_tratativa_nos_dados(json["tipo"], json["dados_para_planilha"], dados)
+def COLETAR_DADOS_EXTERNOS_JSON(param):
+    
+    session = requests.Session()
+    
+    def buscar_dados(url, json, dados_planilha):
+        response = session.get(url, params=json)
+        dados_extraidos = response.json()
+        #A função abaixo possui a função de relacionar os dados com as células da planilha
+        dados_tratados = realizar_tratativa_nos_dados(url, dados_planilha, dados_extraidos)
+        return dados_tratados
+        
+    def realizar_tratativa_nos_dados(url, dados_planilha, dados_extraidos):            
+       
+        dados_tratados = []
+        def formatar_numero_contrato(dict):
+            if (int(dict['Ano']) >= 2025):
+                parse = f"{dict['Contrato'][2:]}/{dict['Ano'][2:]}"
+                dict['Contrato'] = parse   
+        for index in range(len(dados_extraidos)):
+            dict = {}
+            for chave in dados_planilha:       
+                INFO = dados_extraidos[index][dados_planilha[chave]]
+                dict[chave] = INFO
+            if ("contratos" in url.lower()):
+                formatar_numero_contrato(dict)    
+            dados_tratados.append(dict)
+        return dados_tratados
+    
+    dados_tratados = buscar_dados(param["url"], param["json"], param["dados_para_planilha"])
     return dados_tratados
+
+def COLETAR_DADOS_EXTERNOS_XLSX(param):
+    
+    pasta_downloads = pegar_pasta_downloads()
+    planilha = param["planilha_link"]
+    def baixar_planilha(link, botao):
+        def aguardar_pagina_carregar(driver):
+            WebDriverWait(driver, 10).until(
+                lambda d: d.execute_script("return document.readyState") == "complete"
+            )  
+        driver = webdriver.Chrome()
+        driver.get(rf"{URL}/transparencia")
+        print(rf"{URL}/transparencia")
+        aguardar_pagina_carregar(driver)
+        driver.execute_script(botao)
+        driver.get(link)
+        botao = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "btnExportarXLS")))
+        botao.click()
+        time.sleep(10)
+    
+    def ler_os_dados(): 
+        abrir_planilha = load_workbook(rf"{pasta_downloads}\{planilha}")
+        print(abrir_planilha)
+        pass  
+    #baixar_planilha(param["url"], param["botao"])
+    ler_os_dados()
+    return 
+
+
+r"""
+
+
 
 #dto
-def realizar_tratativa_nos_dados(tipo, estrutura_planilha, dados):            
-    
-    def formatar_numero_contrato(dict):
-        if (int(dict['Ano']) >= 2025):
-            parse = f"{dict['Contrato'][2:]}/{dict['Ano'][2:]}"
-            dict['Contrato'] = parse
-            
-    dados_tratados = []
-    for index in range(len(dados)):
-        dict = {}
-        for chave in estrutura_planilha:       
-            DADO = dados[index][estrutura_planilha[chave]]
-            dict[chave] = DADO
-        
-        if (tipo == "contratos"):
-            formatar_numero_contrato(dict) 
-        dados_tratados.append(dict)
-    
-    return dados_tratados
 
 
 
-"""========================================"""
+
 
 def salvar_planilha(dados, caminho):
     # temp 
@@ -131,35 +233,7 @@ def salvar_planilha(dados, caminho):
 
 #salvar_planilha(dados_contrato, r"C:\Users\Usuario\Documents\MRL\1. ANÁLISE DE PAGAMENTOS\INFO\BASE\ANÁLISE FISCAL.xlsx")
         
-"""
-def get_json_despesas():
-    return  { "parametros": {
-            "ConectarExercicio": "2026",
-            "Listagem": "DespesasGerais",
-            "DiaInicioPeriodo": "01",
-            "MesInicialPeriodo": "01",
-            "DiaFinalPeriodo": "31",
-            "MesFinalPeriodo": "12",
-            "Ano": "2026",
-            "Empresa": "1",
-            "MostrarFornecedor": "True",
-            "MostraDadosConsolidado": "False",
-            "UFParaFiltroCOVID": "",
-            "MostrarCNPJFornecedor": "True",
-            "ApenasIDEmpenho": "False",
-            }, 
-            "celula_excel": {
-                "NOMEFOR": "",
-                "CODIGO": "",
-                "TPEM": "",
-                "DATAE": "",
-                "NOMEFOR": "",
-                "PROJETO_ATIVIDADE_NOME": "",
-                "PROGRAMANOME": "",
-                "FICHA": "",
-                "FONTE_STN": "",
-            }
-        }
+
     
 def get_liq_despesas():
      return  {
@@ -213,4 +287,5 @@ def pegar_informacoes(url, json):
 empenhos = pegar_informacoes("http://bataguassums.biosnet.com.br:8079/transparencia/VersaoJson/Despesas/", get_liq_despesas())
 """
 #pegar_informacoes()
+
 

@@ -33,3 +33,6 @@ def pegar_modelos(tipo):
         return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\MODELOS\MODELO DE TERMO.docx"
     elif (tipo == "protocolo"):
         return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\MODELOS\MODELO DE PROTOCOLO.docx"
+    
+def pegar_pasta_downloads():
+    return r"C:\Users\Usuario\Downloads"
