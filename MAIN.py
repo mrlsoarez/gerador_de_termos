@@ -163,18 +163,19 @@ def MAIN():
         
         DADOS = []       
          
-        dados_contratos = COLETAR_DADOS_EXTERNOS("contratos")
-        dados_servidores =  COLETAR_DADOS_EXTERNOS("servidores")
-        dados_empenhos = COLETAR_DADOS_EXTERNOS("empenhos")
-        dados_liquidacao =  COLETAR_DADOS_EXTERNOS("liquidacoes")
+        #dados_contratos = COLETAR_DADOS_EXTERNOS("contratos")
+        #dados_servidores =  COLETAR_DADOS_EXTERNOS("servidores")
+        #dados_empenhos = COLETAR_DADOS_EXTERNOS("empenhos")
+        #dados_liquidacao =  COLETAR_DADOS_EXTERNOS("liquidacoes")
         
         #DADOS.append(dados_contratos)
         #DADOS.append(dados_servidores)
         
-        ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Base", dados_contratos)
-        ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Servidores", dados_servidores)
-        ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Empenhos", dados_empenhos)
-        ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Liquidacoes", dados_liquidacao)
+        # corrigir bug annoying das paginas ;)))))))))))))))))))))))))))))))))))
+        #ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Base", dados_contratos)
+        #ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Servidores", dados_servidores)
+        #ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Empenhos", dados_empenhos)
+        #ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Liquidacoes", dados_liquidacao)
 
         return
 
