@@ -8,6 +8,8 @@ import requests
 from openpyxl import load_workbook
 
 from ENV.environment import pegar_pasta_downloads
+from SERVICES.PLANILHA import CONVERTER_PARA_XLSX
+from MODULES.GerenciarArquivos import verificarArquivo
 
 # Aqui os dados são buscados de fontes externas, seja através de requisição por API ou por acesso automatizado ao site. 
 # Os dados (planilha bruta ou JSON) retornam para o serviço MAIN que redireciona para as planilhas, que irá substituir os dados nas planilhas conforme necessário.
@@ -24,7 +26,16 @@ def COLETAR_DADOS_EXTERNOS(tipo):
     def get_liquidacoes():
         return {"url": rf"{URL}/transparencia/DespesasLiquidadas.aspx",
                 "botao": rf"return ProcessaDados('lnkDespesasLiquidadas')",
-                "planilha_link": "Portal Transp. Despesas Liquidadas.xls"}
+                "planilha_link": "Portal Transp. Despesas Liquidadas.xls",
+                "dados_para_planilha": {
+                    "A": "Local",
+                    "B": "Fundo",
+                    "C": "Empenho",
+                    "D": "Data",
+                    "E": "Valor",
+                    "F": "Favorecido"
+                }
+            }
     
     def get_servidores():
         return { "url": rf"{URL}/transparencia/VersaoJson/Pessoal/",
@@ -130,7 +141,7 @@ def COLETAR_DADOS_EXTERNOS(tipo):
     """
     
     if (tipo == "liquidacoes"):
-        COLETAR_DADOS_EXTERNOS_XLSX(get_liquidacoes())
+        return COLETAR_DADOS_EXTERNOS_XLSX(get_liquidacoes())
     elif (tipo == "contratos"):
         return COLETAR_DADOS_EXTERNOS_JSON(get_contratos())
     elif (tipo == "empenhos"):
@@ -138,6 +149,7 @@ def COLETAR_DADOS_EXTERNOS(tipo):
     elif (tipo == "servidores"):
         return COLETAR_DADOS_EXTERNOS_JSON(get_servidores())
 
+# Ambos retornam JSON, o primeiro extrai dados da API do transparência, o segundo extrai os dados de uma planilha
 def COLETAR_DADOS_EXTERNOS_JSON(param):
     
     session = requests.Session()
@@ -173,28 +185,46 @@ def COLETAR_DADOS_EXTERNOS_XLSX(param):
     
     pasta_downloads = pegar_pasta_downloads()
     planilha = param["planilha_link"]
+    
     def baixar_planilha(link, botao):
         def aguardar_pagina_carregar(driver):
             WebDriverWait(driver, 10).until(
                 lambda d: d.execute_script("return document.readyState") == "complete"
             )  
+        
         driver = webdriver.Chrome()
         driver.get(rf"{URL}/transparencia")
-        print(rf"{URL}/transparencia")
         aguardar_pagina_carregar(driver)
+        
         driver.execute_script(botao)
         driver.get(link)
+        
         botao = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "btnExportarXLS")))
         botao.click()
         time.sleep(10)
     
-    def ler_os_dados(): 
-        abrir_planilha = load_workbook(rf"{pasta_downloads}\{planilha}")
-        print(abrir_planilha)
-        pass  
-    #baixar_planilha(param["url"], param["botao"])
-    ler_os_dados()
-    return 
+    def converter_dados(estrutura_planilha): 
+        
+        conversao_planilha = CONVERTER_PARA_XLSX(rf"{pasta_downloads}\{planilha}")
+        planilha_transp = load_workbook(rf"{conversao_planilha}")
+        SHEET = planilha_transp.active 
+        
+        dados_convertidos = []
+        for i in range(2, SHEET.max_row):
+            dict = {}
+            for chave in estrutura_planilha:
+                dict[estrutura_planilha[chave]] = SHEET[chave + str(i)].value         
+            dados_convertidos.append(dict)
+            
+        return dados_convertidos
+    
+    if ((verificarArquivo(rf"{pasta_downloads}\{planilha}x") or verificarArquivo(rf"{pasta_downloads}\{planilha}"))):
+        pass 
+    else:
+        try:    baixar_planilha(param["url"], param["botao"])
+        except: pass 
+
+    return converter_dados(param["dados_para_planilha"])
 
 
 r"""

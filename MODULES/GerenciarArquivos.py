@@ -1,7 +1,11 @@
 
 import os 
+
 from MODULES.EncontrarData import EncontrarData
 from ENV.environment import pegar_numero_protocolo
+
+def verificarArquivo(arq):
+    return os.path.exists(rf"{arq}")
 
 class GerenciarArquivos:
     
@@ -22,6 +26,7 @@ class GerenciarArquivos:
         
     def verificarArquivo(self, arq):
         return os.path.exists(rf"{self.pasta_atual}/{arq}")
+    
     #### precisa sair daqui
     def criar_pasta_termos(self):
         

@@ -147,30 +147,36 @@ def MAIN():
             # -> Inclusão dos servidores
         ## Futuramente, inclusão de JSON com os dados de ata
         
-    pergunta_inicial = "2"
+    pergunta_inicial = "1"
     pergunta_update = "s"
     r"""
     
-    TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)
-    PASTA_PLANILHA_ANALISE = pegar_planilha_termo(TIPO_TERMO["arquivo"])
     
     GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), TIPO_TERMO["tipo"])
     GERENCIADOR_PASTAS.criar_pasta_termos()
     
     """
-    # cerca de 1 min pra rodar (motivo: esperar o download terminar)
+    TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)
+    PASTA_PLANILHA_ANALISE = pegar_planilha_termo(TIPO_TERMO["arquivo"])
+    
     if (pergunta_update == "s"): 
         
+        DADOS = []       
+         
         dados_contratos = COLETAR_DADOS_EXTERNOS("contratos")
+        dados_servidores =  COLETAR_DADOS_EXTERNOS("servidores")
         dados_empenhos = COLETAR_DADOS_EXTERNOS("empenhos")
-        dados_servidores = COLETAR_DADOS_EXTERNOS("servidores")
-        COLETAR_DADOS_EXTERNOS("liquidacoes")
-        #COLETAR_DADOS_EXTERNOS("return ProcessaDados('lnkDespesasPor_NotaEmpenho');", "http://bataguassums.biosnet.com.br:8079/transparencia/DespesasPorEntidade.aspx")
-        #COLETAR_DADOS_EXTERNOS("return ProcessaDados('lnkDespesasLiquidadas');", "http://bataguassums.biosnet.com.br:8079/transparencia/DespesasLiquidadas.aspx")
-        #ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE)
-        #print(dados_servidores)
+        dados_liquidacao =  COLETAR_DADOS_EXTERNOS("liquidacoes")
+        
+        #DADOS.append(dados_contratos)
+        #DADOS.append(dados_servidores)
+        
+        ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Base", dados_contratos)
+        ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Servidores", dados_servidores)
+        ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Empenhos", dados_empenhos)
+        ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Liquidacoes", dados_liquidacao)
+
         return
-        pass
 
     #INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS)
 

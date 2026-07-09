@@ -11,16 +11,43 @@ import time
 
 # Funções referentes a planilha
 
-def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(localizacao_planilha):
-    
-    pasta = r"C:\Users\Usuario\Downloads"
-
-    def converter_para_xlsx(arquivo):
+def CONVERTER_PARA_XLSX(arquivo):
         arquivo_xls = arquivo
         arquivo_xlsx = arquivo_xls + "x"
-        df = pd.read_excel(arquivo_xls, engine="xlrd")
-        df.to_excel(arquivo_xlsx, index=False)
-        os.remove(arquivo_xls)
+        try:
+            df = pd.read_excel(arquivo_xls, engine="xlrd")
+            df.to_excel(arquivo_xlsx, index=False)
+            os.remove(arquivo_xls)
+        except:
+            pass 
+        finally: 
+            return arquivo_xlsx
+            
+        
+def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(localizacao_planilha, nome_sheet, dados):
+    
+    ANALISE_FISCAL = load_workbook(localizacao_planilha)
+    
+    def limpar_planilha(sheet):
+        for row in sheet.iter_rows():
+            for cell in row:
+                cell.value = None
+    
+    SHEET = ANALISE_FISCAL[nome_sheet]
+    limpar_planilha(SHEET)
+    
+    HEAD = []
+    for keys in dados[0]:
+        HEAD.append(keys)
+    SHEET.append(HEAD)
+
+    for linha in dados: 
+        SHEET.append([linha.get(coluna, "") for coluna in HEAD])
+        
+   
+    ANALISE_FISCAL.save(localizacao_planilha)
+
+    """
 
     def atualizar_planilha(sheet_origem, sheet_destino):
         origem = sheet_origem.active
@@ -52,6 +79,8 @@ def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(localizacao_planilha):
     else:
         ANALISE_FISCAL.save(localizacao_planilha)
 
+    """
+    
 def INICIAR_PLANILHA(localizacao_planilha, gerenciador_arquivos):
 
     excel = win32com.client.Dispatch("Excel.Application")
