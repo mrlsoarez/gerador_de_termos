@@ -29,12 +29,12 @@ def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(localizacao_planilha, nome_sheet, dado
     ANALISE_FISCAL = load_workbook(localizacao_planilha)
     
     def limpar_planilha(sheet):
-        for row in sheet.iter_rows():
-            for cell in row:
-                cell.value = None
+        if sheet.max_row > 0:
+            sheet.delete_rows(1, sheet.max_row)
     
     SHEET = ANALISE_FISCAL[nome_sheet]
     limpar_planilha(SHEET)
+
     
     HEAD = []
     for keys in dados[0]:
@@ -46,8 +46,8 @@ def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(localizacao_planilha, nome_sheet, dado
         
    
     ANALISE_FISCAL.save(localizacao_planilha)
-
     """
+
 
     def atualizar_planilha(sheet_origem, sheet_destino):
         origem = sheet_origem.active
@@ -80,6 +80,7 @@ def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(localizacao_planilha, nome_sheet, dado
         ANALISE_FISCAL.save(localizacao_planilha)
 
     """
+   
     
 def INICIAR_PLANILHA(localizacao_planilha, gerenciador_arquivos):
 
