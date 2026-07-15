@@ -46,6 +46,7 @@ class Documento:
     def mudar_tamanho(texto, px): 
         texto.font.size = Pt(px)
 
+    @staticmethod
     def criar_texto(paragrafo, texto, negrito = False, posicionamento = None, px = None, fonte = None):
 
         def deixar_negrito(run): 
@@ -64,6 +65,7 @@ class Documento:
         if (px != None): Documento.mudar_tamanho(run, px)
         if (fonte != None): Documento.mudar_fonte(run, fonte)
 
+    @staticmethod
     def encontrar_data_de_hoje_em_extenso():  
 
         dia = EncontrarData("dia")
@@ -75,8 +77,7 @@ class Documento:
     def adicionar_linha_de_assinatura(paragrafo, assinador): 
         Documento.criar_texto(paragrafo, f"________________________________________\n{assinador}", negrito = True, posicionamento = "Centro", fonte = "Cambria")
  
-
-    def modificar_tabela(tabela, dados): 
+    def modificar_tabela(self, tabela, dados): 
 
         for i in range(len(dados)):
 
@@ -85,7 +86,7 @@ class Documento:
             celula = tabela.cell(dado["celula"][0], dado["celula"][1])
             paragrafo = celula.paragraphs[0]  
 
-        Documento.criar_texto(paragrafo, dado["conteudo"], dado["negrito"], px = 10, fonte = "Cambria")
+            Documento.criar_texto(paragrafo, dado["conteudo"], dado["negrito"], px = 10, fonte = "Cambria")
 
         return tabela
                
@@ -101,17 +102,16 @@ class Termo(Documento):
         self.mensagem = mensagem
         self.tipo = tipo
 
-    def criar_arquivo(self, doc):
+    def criar_arquivo(self, model):
+        
+        doc = Document(model)
         
         def definir_tabela(self):
-            
-            tabela = doc.tables[0]
 
             if self.tipo.lower() == "ata":
                 campo = "ATA N°"
             else:
                 campo = "CONTRATO N°" 
-
 
             dados = [{"celula": (1, 0), "conteudo": campo, "negrito": True}, 
                      {"celula": (1, 1), "conteudo": self.contrato, "negrito": False }, 
@@ -120,11 +120,15 @@ class Termo(Documento):
                      {"celula": (4, 1), "conteudo": self.af, "negrito": False}, 
                      {"celula": (6, 1), "conteudo": self.mensagem, "negrito": False }, 
                     ]
-
-            self.modificar_tabela(tabela, dados)
             
-        definir_tabela(self)
+            doc.tables[0] = self.modificar_tabela(doc.tables[0], dados)
+        def definir_data(self):
+            Documento.encontrar_data_de_hoje_em_extenso()
         
+        #definir_tabela(self)
+        definir_data(self)
+        
+        return doc 
         pass 
      
 class Relatorio(Documento):
@@ -179,14 +183,15 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador):
         
             doc = instanciar_documento(PLANILHA[ordem])
             RELATORIO_INFO.append(colher_informacoes_relatorio(doc.contratado, PLANILHA[ordem]))
-            #nome_arquivo = verificar_se_arquivo_existe(doc.contratado, PLANILHA[ordem])
-            nome_arquivo = "1. CENTRO AMERICA FROTAS LTDA - AF 1950.docx"
+            nome_arquivo = verificar_se_arquivo_existe(doc.contratado, PLANILHA[ordem])
             
             # Verifica se o arquivo existe, se não cria um termo na pasta atual (dia atual/ remessa x / word)
             if (nome_arquivo != True):
                 termo = colher_informacoes_termo(ordem, doc.contratado, PLANILHA[ordem], nome_arquivo)
-                termo.copiar_arquivo(modelo_termo, termo.endereco)
-                termo.criar_arquivo(Document(termo.endereco))
+                #termo.copiar_arquivo(modelo_termo, termo.endereco)
+                doc = termo.criar_arquivo(modelo_termo)
+                doc.save(termo.endereco)
+                
                 """
                 ****** end_modelo needs to be in class
                 """
