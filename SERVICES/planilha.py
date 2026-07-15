@@ -89,20 +89,17 @@ def INICIAR_PLANILHA(localizacao_planilha, gerenciador_arquivos):
 
     wb = excel.Workbooks.Open(localizacao_planilha)
     
-    modified = os.path.getmtime(localizacao_planilha)
-    modified = datetime.fromtimestamp(modified)
+    modified = datetime.fromtimestamp(os.path.getmtime(localizacao_planilha))
+
     try:
         while True:
             time.sleep(1)
             last_modified = os.path.getmtime(localizacao_planilha)
             last_modified = datetime.fromtimestamp(last_modified)
             if (last_modified > modified):
-                # aqui começa a criar o termo, op assincrona?
                 PROCESSAR_ARQUIVO(localizacao_planilha, gerenciador_arquivos)
-                modified = os.path.getmtime(localizacao_planilha)
-                modified = datetime.fromtimestamp(modified)
-                gerenciador_arquivos.entrar_na_pasta("..")
-                
+                modified = datetime.fromtimestamp(os.path.getmtime(localizacao_planilha))     
+                gerenciador_arquivos.entrarEmPasta("..")
     except KeyboardInterrupt:
         print("Encerrando...")
     finally:

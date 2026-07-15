@@ -66,25 +66,7 @@ class Termo:
 
         doc = Document(termo)
 
-        def definir_tabela():
-
-            tabela = doc.tables[0]
-
-            if tipo["corresponde_a"] == "ata":
-                campo = "ATA N°"
-            else:
-                campo = "CONTRATO N°" 
-
-
-            dados = [{"celula": (1, 0), "conteudo": campo, "negrito": True}, 
-                     {"celula": (1, 1), "conteudo": self.contrato, "negrito": False }, 
-                     {"celula": (2, 1), "conteudo": self.contratado, "negrito": False }, 
-                     {"celula": (3, 1), "conteudo": self.objeto, "negrito": False }, 
-                     {"celula": (4, 1), "conteudo": self.af, "negrito": False}, 
-                     {"celula": (6, 1), "conteudo": self.mensagem, "negrito": False }, 
-                    ]
-
-            DocHelper.modificar_tabela(tabela, dados)
+        
 
         def adicionar_espaco():
             doc.add_paragraph("")

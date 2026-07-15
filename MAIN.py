@@ -148,27 +148,25 @@ def MAIN():
         ## Futuramente, inclusão de JSON com os dados de ata
         
     pergunta_inicial = "1"
-    pergunta_update = "s"
+    pergunta_update = "n"
     r"""
     
     
-    GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), TIPO_TERMO["tipo"])
-    GERENCIADOR_PASTAS.criar_pasta_termos()
     
     """
     TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)
     PASTA_PLANILHA_ANALISE = pegar_planilha_termo(TIPO_TERMO["arquivo"])
     
+    GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), TIPO_TERMO["tipo"])
+    GERENCIADOR_PASTAS.criar_pasta_termos()
+    
     if (pergunta_update == "s"): 
-        
-        DADOS = []       
-         
+    
         dados_contratos = COLETAR_DADOS_EXTERNOS("contratos")
         dados_servidores =  COLETAR_DADOS_EXTERNOS("servidores")
         dados_empenhos = COLETAR_DADOS_EXTERNOS("empenhos")
         dados_liquidacao =  COLETAR_DADOS_EXTERNOS("liquidacoes")
-
-        
+    
         ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Base", dados_contratos)
         ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Servidores", dados_servidores)
         ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Empenhos", dados_empenhos)
@@ -176,7 +174,7 @@ def MAIN():
 
         return
 
-    #INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS)
+    INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS)
 
 def CAPTURAR_RESPOSTA(mensagem, dado_esperado):
 

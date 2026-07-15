@@ -40,12 +40,12 @@ class GerenciarArquivos:
         PASTA_DIA = f"{dia}-{mes_numero}"
         PROTOCOLO = f"REMESSA X - PROTOCOLO N° {self.numero_protocolo}"
         
-        self.criar_pasta(PASTA_MES, True)
-        self.criar_pasta(PASTA_DIA, True)
-        self.criar_pasta(PROTOCOLO, True)
-        self.criar_pasta(self.tipo_arquivo, True)
-        self.criar_pasta("WORD")
-        self.criar_pasta("PDF")
+        self.criarPasta(PASTA_MES, True)
+        self.criarPasta(PASTA_DIA, True)
+        self.criarPasta(PROTOCOLO, True)
+        self.criarPasta(self.tipo_arquivo, True)
+        self.criarPasta("WORD")
+        self.criarPasta("PDF")
         
         self.pasta_atual = rf"{self.pasta_base}\{PASTA_MES}\{PASTA_DIA}\{PROTOCOLO}\{self.tipo_arquivo}"
         
