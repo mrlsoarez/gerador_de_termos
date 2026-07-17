@@ -183,6 +183,7 @@ def CAPTURAR_RESPOSTA(mensagem, dado_esperado):
     while PERGUNTA not in dado_esperado:
         print(("Opção não válida, por favor, digite uma das opções ao lado ", dado_esperado))
         PERGUNTA = input(mensagem).lower()
+        
     return PERGUNTA
 
 MAIN()
