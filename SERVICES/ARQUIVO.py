@@ -1,4 +1,5 @@
 from openpyxl import load_workbook
+
 from MODULES.GerenciarArquivos import GerenciarArquivos
 from MODULES.EncontrarData import EncontrarData
 
@@ -7,6 +8,7 @@ from ENV.environment import pegar_modelos
 import os
 import shutil
 from docx import Document
+from docx2pdf import convert
 
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from datetime import date
@@ -59,7 +61,6 @@ class Documento:
                 paragrafo.alignment = WD_ALIGN_PARAGRAPH.RIGHT 
 
         run = paragrafo.add_run(str(texto))
-    
         if (negrito): deixar_negrito(run)
         if (posicionamento != None): alinhar_texto(paragrafo, posicionamento)
         if (px != None): Documento.mudar_tamanho(run, px)
@@ -69,15 +70,17 @@ class Documento:
     def encontrar_data_de_hoje_em_extenso():  
 
         dia = EncontrarData("dia")
-        mes = EncontrarData("mes", extenso = True)
+        mes = EncontrarData("mes", True)
         ano = EncontrarData("ano")
         
-        print(dia, mes, ano)
+        return f"{dia} de {mes} de {ano}"
 
+    @staticmethod
     def adicionar_linha_de_assinatura(paragrafo, assinador): 
         Documento.criar_texto(paragrafo, f"________________________________________\n{assinador}", negrito = True, posicionamento = "Centro", fonte = "Cambria")
- 
-    def modificar_tabela(self, tabela, dados): 
+    
+    @staticmethod
+    def modificar_tabela(tabela, dados): 
 
         for i in range(len(dados)):
 
@@ -89,7 +92,14 @@ class Documento:
             Documento.criar_texto(paragrafo, dado["conteudo"], dado["negrito"], px = 10, fonte = "Cambria")
 
         return tabela
-               
+    
+    @staticmethod
+    def salvar_pdf(self):
+        pdf = self.endereco.replace("WORD", "PDF")
+        pdf = pdf.replace(".docx", ".pdf")
+        #convert(docx, pdf)
+        return pdf
+                   
 class Termo(Documento):
     
     def __init__(self, contratado, endereco, ordem, contrato, objeto, af, mensagem, tipo):
@@ -101,6 +111,7 @@ class Termo(Documento):
         self.af = af
         self.mensagem = mensagem
         self.tipo = tipo
+
 
     def criar_arquivo(self, model):
         
@@ -121,16 +132,37 @@ class Termo(Documento):
                      {"celula": (6, 1), "conteudo": self.mensagem, "negrito": False }, 
                     ]
             
-            doc.tables[0] = self.modificar_tabela(doc.tables[0], dados)
+            doc.tables[0] = Documento.modificar_tabela(doc.tables[0], dados)
+            
         def definir_data(self):
-            Documento.encontrar_data_de_hoje_em_extenso()
+            data_texto = "BATAGUASSU/MS, " + Documento.encontrar_data_de_hoje_em_extenso()
+            Documento.criar_texto(doc.add_paragraph(), data_texto, negrito = True, posicionamento = "Direita")
         
-        #definir_tabela(self)
+        def adicionar_espaco(self, quant):
+            for i in range(quant):
+                doc.add_paragraph("")
+        
+        def definir_gestor(self):
+            print(self.tipo)
+            if self.tipo.lower() == "contrato":
+                Documento.adicionar_linha_de_assinatura(doc.add_paragraph(), "RONALDO DE SOUZA MARCÍLIO\nGESTOR DE CONTRATOS")
+            else:
+                Documento.adicionar_linha_de_assinatura(doc.add_paragraph(), "MURILO SOARES DE OLIVEIRA\nGESTOR DE ATAS")
+                
+        definir_tabela(self)
         definir_data(self)
+        adicionar_espaco(self, 3)
+        definir_gestor(self)
         
         return doc 
-        pass 
-     
+    
+    def salvar_pdf(self):
+        docx = self.endereco
+        pdf = docx.replace("WORD", "PDF")
+        pdf = pdf.replace(".docx", ".pdf")
+        print(f"Convertendo termo para PDF.... *.✧*.✧.*.✧*.✧*.✧*.✧.,*.✧*. {self.contratado} - AF {self.af}")
+        convert(docx, pdf)
+        
 class Relatorio(Documento):
     
     def __init__(self, contratado, liquidacao, valor, data):
@@ -138,7 +170,8 @@ class Relatorio(Documento):
         self.liquidacao = liquidacao
         self.valor = valor
         self.data = data 
-        
+
+# avaliar se existe a necessidade do gerenciador de pastas aqui
 def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador):
     
     PLANILHA = load_workbook(sheet_planilha, data_only= True)
@@ -166,7 +199,7 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador):
         def customizar_mensagem(tipo):
             if (tipo == "Locação"): return "Por este instrumento, em caráter DEFINITIVO, atestamos que a locação acima identificada atende às exigências contratuais."
             return f"Por este instrumento, em caráter DEFINITIVO, atestamos que os {tipo.lower()} acima identificados atendem às exigências contratuais."
-        endereco = rf"{gerenciador.pasta_atual}\{arq}"
+        endereco = rf"{gerenciador.pasta_atual}\{arq}.docx"
         numero_af = sheet[MAPEAMENTO['numero_af']].value
         contrato = sheet[MAPEAMENTO['n_contrato']].value 
         objeto = sheet[MAPEAMENTO['objeto']].value 
@@ -184,13 +217,19 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador):
             doc = instanciar_documento(PLANILHA[ordem])
             RELATORIO_INFO.append(colher_informacoes_relatorio(doc.contratado, PLANILHA[ordem]))
             nome_arquivo = verificar_se_arquivo_existe(doc.contratado, PLANILHA[ordem])
-            
+            #nome_arquivo = "1. CENTRO AMERICA FROTAS LTDA - AF 1950"
             # Verifica se o arquivo existe, se não cria um termo na pasta atual (dia atual/ remessa x / word)
             if (nome_arquivo != True):
+                
                 termo = colher_informacoes_termo(ordem, doc.contratado, PLANILHA[ordem], nome_arquivo)
-                #termo.copiar_arquivo(modelo_termo, termo.endereco)
+                
                 doc = termo.criar_arquivo(modelo_termo)
                 doc.save(termo.endereco)
+                try:
+                    termo.salvar_pdf()
+                except: 
+                    pass
+               
                 
                 """
                 ****** end_modelo needs to be in class
@@ -203,5 +242,5 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador):
                 pass
             
         
-    
+
         
