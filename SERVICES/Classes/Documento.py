@@ -15,37 +15,20 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from datetime import date
 from docx.shared import Pt
 
+
 class Documento: 
 
     endereco_protocolo = pegar_modelos("protocolo")
     
     def __init__(self, contratado):
         self.contratado = contratado
-
-    def set_contratado(self, dado):
-        self.contratado = dado 
         
-    def get_mapeamento_termos(self):
-        return {
-                "contratado": "B4",
-                "n_contrato": "E4",
-                "objeto": "F4",
-                "numero_empenho": "A8",
-                "numero_liquidacao": "A12",
-                "data_liquidacao": "B12",
-                "valor_bruto_liquidacao": "C12",
-                "tipo_nota": "D16",
-                "numero_af": "A20",
-            }
-        
-    def checar_campos_planilha(self, sheet):
-        mapa = self.get_mapeamento_termos()
-        for campo, celula in mapa.items():
-            valor = sheet[celula].value 
-            if (valor == None):
-                return False, f'{sheet} -> O campo "{campo}" desta planilha está vazio e sem conteúdo. Necessário preencher e tentar novamente!' 
-        return True, ""
+    def set_af(self, dado):
+        self.af = dado
     
+    def set_arq_nome(self, dado):
+        self.arq = dado 
+        
     def copiar_arquivo(self, antigo, novo):
         shutil.copy(antigo, novo)
         
@@ -109,7 +92,7 @@ class Documento:
                    
 class Termo(Documento):
     
-    def __init__(self, contratado, endereco, ordem, contrato, objeto, af, mensagem, tipo):
+    def __init__(self, contratado, endereco, ordem, contrato, objeto, af, mensagem, gestor, tipo, modelo):
         super().__init__(contratado)
         self.ordem = ordem
         self.endereco = endereco
@@ -117,12 +100,14 @@ class Termo(Documento):
         self.objeto = objeto 
         self.af = af
         self.mensagem = mensagem
+        self.gestor = gestor
         self.tipo = tipo
+        self.modelo = modelo 
 
 
-    def criar_arquivo(self, model):
+    def criar_arquivo(self):
         
-        doc = Document(model)
+        doc = Document(self.modelo)
         
         def definir_tabela(self):
 
@@ -150,18 +135,15 @@ class Termo(Documento):
                 doc.add_paragraph("")
         
         def definir_gestor(self):
-            print(self.tipo)
-            if self.tipo.lower() == "contrato":
-                Documento.adicionar_linha_de_assinatura(doc.add_paragraph(), "RONALDO DE SOUZA MARCÍLIO\nGESTOR DE CONTRATOS")
-            else:
-                Documento.adicionar_linha_de_assinatura(doc.add_paragraph(), "MURILO SOARES DE OLIVEIRA\nGESTOR DE ATAS")
+            Documento.adicionar_linha_de_assinatura(doc.add_paragraph(), self.gestor)
+            
                 
         definir_tabela(self)
         definir_data(self)
         adicionar_espaco(self, 3)
         definir_gestor(self)
         
-        return doc 
+        doc.save(self.endereco)
     
     def salvar_pdf(self):
         docx = self.endereco

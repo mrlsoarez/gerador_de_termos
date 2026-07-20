@@ -62,7 +62,7 @@ def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS():
     def converter_para_xlsx(arquivo):
         try:
             arquivo_xls = arquivo
-            arquivo_xlsx = arquivo_xls + "x"
+            arquivo_xlsx =5 arquivo_xls + "x"
             df = pd.read_excel(arquivo_xls, engine="xlrd")
             df.to_excel(arquivo_xlsx, index=False)
             os.remove(arquivo_xls)

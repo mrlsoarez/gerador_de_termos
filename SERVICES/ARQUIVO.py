@@ -4,7 +4,8 @@ from MODULES.GerenciarArquivos import GerenciarArquivos
 from MODULES.EncontrarData import EncontrarData
 
 from ENV.environment import pegar_modelos
-from SERVICES.Classes.Documento import Documento
+from SERVICES.Classes.Documento import Documento, Termo
+from SERVICES.Classes.Verificador import Verificador 
 
 import os
 import shutil
@@ -20,7 +21,6 @@ from docx.shared import Pt
 
 RELATORIO_INFO = []
 
-modelo_termo = pegar_modelos("termo")
 modelo_relatorio = pegar_modelos("relatorio")
 
 # she was so happy to look a mess
@@ -28,46 +28,82 @@ modelo_relatorio = pegar_modelos("relatorio")
 def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, op):
     
     # trabalha o relatorio e o termo aqui
-    def gerar_termos(sheet):
+    def gerar_termos(sheet, ordem):
+                
+        verificador = Verificador("", sheet)   
+        gerenciador.entrarEmPasta("WORD")
+        
+        def verificar_informacoes_iniciais():
+            verificacao = verificador.checar_campos_planilha()
             
-            # todos os dados da planilha precisam estar preenchidos para checar se arquivo existe
-            def verificar_se_arquivo_existe():
+            if (verificacao["resultado"]):
+                verificador.set_info()
+                if (not gerenciador.verificarArquivo(verificador.arq)):
+                    doc = Documento(verificador.contratado)
+                    doc.set_af(verificador.af)
+                    doc.set_arq_nome(verificador.arq)
+                    return doc
+                return False
+            else: 
+                print(verificacao["mensagem"])
+                return False 
                 
-                doc_intermediario = Documento("")
-                mapa = doc_intermediario.get_mapeamento_termos()
+                    
                 
-                verificao = doc_intermediario.checar_campos_planilha(sheet)
                 
-                if (verificao[0] == False):
-                    print(f'{verificao[1]}')
-                    return 
                 
-                contratado = sheet[mapa['contratado']].value
-                numero_af = sheet[mapa['numero_af']].value[:4]
-                
-                doc_intermediario.set_contratado(contratado)
-                return gerenciador.verificarArquivo(f"{contratado} - AF {numero_af}.docx"), doc_intermediario
+                #doc_intermediario.set_contratado(contratado)
+                #return gerenciador.verificarArquivo(f"{contratado} - AF {numero_af}.docx"), doc_intermediario
                                
             # 1. PRIMEIRO ABRE A PLANILHA E AVALIA SE A SHEET É UM NUMERO, SE FOR INICIA A ANÁLISE ok
+            # 2. SE NÃO EXISTIR, UTILIZAR O MAPEAMENTO PARA VERIFICAR SE AS INFORMAÇÕES VITAIS ESTÃO PREENCHIDAS
             # 2. COMEÇA VERIFICANDO SE O ARQUIVO EXISTE NA PASTA MONTANDO UMA VARIÁVEL INTERMEDIÁRIA E TEMPORÁRIA ok
-            # 3. SE NÃO EXISTIR, UTILIZAR O MAPEAMENTO PARA VERIFICAR SE AS INFORMAÇÕES VITAIS ESTÃO PREENCHIDAS
             # 4. SE O MAPEAMENTO ESTIVER OK, INSTANCIAR OBJETO E INICIALIZAR O DOCUMENTO
             
-            gerenciador.entrarEmPasta("WORD")
+            verificacao = verificar_informacoes_iniciais()
+            print(verificacao)
+
+        def colher_informacoes_termo(doc):
             
-            verificacao_inicial = verificar_se_arquivo_existe()
+            def customizar_mensagem(tipo):
+                if (tipo == "Locação"): return "Por este instrumento, em caráter DEFINITIVO, atestamos que a locação acima identificada atende às exigências contratuais."
+                return f"Por este instrumento, em caráter DEFINITIVO, atestamos que os {tipo.lower()} acima identificados atendem às exigências contratuais."
             
-            if (verificacao_inicial[0] == False):
-                DOC = verificacao_inicial[1]
-                print(DOC)
-                           
+            def definir_gestor(tipo):
+                if (tipo == "contrato"):
+                    return "RONALDO DE SOUZA MARCÍLIO\nGESTOR DE CONTRATOS"   
+                else:
+                    return "MURILO SOARES DE OLIVEIRA\nGESTOR DE ATAS"
+            
+            mapa = verificador.mapa 
+            
+            mensagem = customizar_mensagem(str(sheet[mapa['tipo_nota']].value))
+            print(gerenciador.pasta_atual)
+            endereco = rf"{gerenciador.pasta_atual}\{doc.arq}.docx"
+            gestor = definir_gestor(gerenciador.tipo_arquivo)
+            contrato = sheet[mapa['n_contrato']].value
+            modelo_termo = pegar_modelos("termo")
+            objeto = sheet[mapa['objeto']].value 
+            tipo = gerenciador.tipo_arquivo
+            contratado = doc.contratado
+            numero_af = doc.af 
+            
+            return Termo(contratado, endereco, ordem, contrato, objeto, numero_af, mensagem, gestor, tipo, modelo_termo)
+        
+        # Se não for encontrado um arquivo existente ou informações faltantes na planilha,
+        # 
+        doc_verificacao = verificar_informacoes_iniciais()
+        
+        if (doc_verificacao != False):
+            termo = colher_informacoes_termo(doc_verificacao)
+            termo.criar_arquivo()                   
     PLANILHA = load_workbook(sheet_planilha, data_only= True)
 
     if (op == "1" or op == "2"):
         for ordem in (PLANILHA.sheetnames):
             if (ordem.isdigit() and op == "1"):
-                gerar_termos(PLANILHA[ordem])
-         
+                gerar_termos(PLANILHA[ordem], ordem)
+
     
     
     """
