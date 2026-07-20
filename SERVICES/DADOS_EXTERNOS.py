@@ -140,14 +140,20 @@ def COLETAR_DADOS_EXTERNOS(tipo):
             print(f"Não foi possível capturar a planilha referente a... {link}. Permanecendo com os dados anteriores.")
     """
     
-    if (tipo == "liquidacoes"):
-        return COLETAR_DADOS_EXTERNOS_XLSX(get_liquidacoes())
-    elif (tipo == "contratos"):
-        return COLETAR_DADOS_EXTERNOS_JSON(get_contratos())
-    elif (tipo == "empenhos"):
-        return COLETAR_DADOS_EXTERNOS_JSON(get_empenhos())
-    elif (tipo == "servidores"):
-        return COLETAR_DADOS_EXTERNOS_JSON(get_servidores())
+    try: 
+        print(f"Buscando dado de tipo {tipo}...")
+        if (tipo == "liquidacoes"):
+            return COLETAR_DADOS_EXTERNOS_XLSX(get_liquidacoes())
+        elif (tipo == "contratos"):
+            return COLETAR_DADOS_EXTERNOS_JSON(get_contratos())
+        elif (tipo == "empenhos"):
+            return COLETAR_DADOS_EXTERNOS_JSON(get_empenhos())
+        elif (tipo == "servidores"):
+            return COLETAR_DADOS_EXTERNOS_JSON(get_servidores())
+    except:
+        print(f"Algo deu errado ao buscar o dado externo em JSON/planilha do tipo {tipo}")
+    else:
+        print(f"Dado buscado externamente e encontrado do tipo {tipo}")
 
 # Ambos retornam JSON, o primeiro extrai dados da API do transparência, o segundo extrai os dados de uma planilha
 def COLETAR_DADOS_EXTERNOS_JSON(param):
@@ -160,6 +166,7 @@ def COLETAR_DADOS_EXTERNOS_JSON(param):
         #A função abaixo possui a função de relacionar os dados com as células da planilha
         dados_tratados = realizar_tratativa_nos_dados(url, dados_planilha, dados_extraidos)
         return dados_tratados
+
         
     def realizar_tratativa_nos_dados(url, dados_planilha, dados_extraidos):            
        

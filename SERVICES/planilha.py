@@ -80,13 +80,11 @@ def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(localizacao_planilha, nome_sheet, dado
         ANALISE_FISCAL.save(localizacao_planilha)
 
     """
-   
-    
+     
 def INICIAR_PLANILHA(localizacao_planilha, gerenciador_arquivos):
 
     excel = win32com.client.Dispatch("Excel.Application")
-    
-    
+
     excel.Visible = True
 
     wb = excel.Workbooks.Open(localizacao_planilha)

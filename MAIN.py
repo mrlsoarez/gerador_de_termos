@@ -147,13 +147,14 @@ def MAIN():
             # -> Inclusão dos servidores
         ## Futuramente, inclusão de JSON com os dados de ata
         
-    pergunta_inicial = "1"
-    pergunta_update = "n"
     r"""
     
     
     
     """
+    pergunta_inicial = "1"
+    pergunta_update = "s"
+    
     TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)
     PASTA_PLANILHA_ANALISE = pegar_planilha_termo(TIPO_TERMO["arquivo"])
     
@@ -161,7 +162,9 @@ def MAIN():
     GERENCIADOR_PASTAS.criar_pasta_termos()
     
     if (pergunta_update == "s"): 
-    
+        
+        print("Iniciando a coleta de dados externos..")
+        
         dados_contratos = COLETAR_DADOS_EXTERNOS("contratos")
         dados_servidores =  COLETAR_DADOS_EXTERNOS("servidores")
         dados_empenhos = COLETAR_DADOS_EXTERNOS("empenhos")
