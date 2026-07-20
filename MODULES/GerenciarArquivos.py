@@ -10,6 +10,7 @@ def verificarArquivo(arq):
 class GerenciarArquivos:
     
     numero_protocolo = pegar_numero_protocolo()
+
     pasta_atual = None 
     
     def __init__(self, pasta_base, tipo_arquivo):
@@ -51,6 +52,7 @@ class GerenciarArquivos:
         
         self.pasta_atual = rf"{self.pasta_base}\{PASTA_MES}\{PASTA_DIA}\{PROTOCOLO}\{self.tipo_arquivo}"
         
-        
+    def criar_pasta_protocolo(self):
+        print(self.p)
     
         

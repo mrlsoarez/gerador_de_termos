@@ -139,20 +139,12 @@ def MAIN():
             "Deseja atualizar os dados da planilha? (S/N) -> ", ("s", "n")
         )
         """
-    
-    
-    # A coleta de dados externos oferece uma estrutura que envolve
-        # -> Atualização da planilha contrato com dados atualizados dos contratos
-            # -> Inclusão dos empenhos e liquidações atualizadas
-            # -> Inclusão dos servidores
-        ## Futuramente, inclusão de JSON com os dados de ata
-        
-    
         pergunta_inicial = "1"
         pergunta_update = "s"
         
         # realizando as tratativas inicias, criações de pastas e localização dos arquivos
             # dependente da configuração correta do env
+        
         TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)
         PASTA_PLANILHA_ANALISE = pegar_planilha_termo(TIPO_TERMO["arquivo"])
         GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), TIPO_TERMO["tipo"])
@@ -188,16 +180,17 @@ def MAIN():
         print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\nIniciando planilha..")
         INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, op)
     
-    #opcao = MENU()
-    opcao = "1"
+    def iniciar_modulo_protocolo(op):
+        pass 
     
-    if (opcao == "1"):
-        iniciar_modulo_termos(opcao)
-        print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
-        MENU()
-    elif (opcao == "5"):
-        print("Encerrando programa.")
-        return 
+    while True:        
+        resposta = CAPTURAR_RESPOSTA("Bem vindo! Escolha dentre as opções \n1. Gerar termos aditivos\n2. Gerar relatório\n3. Atualizar número de protocolo\n4. Gerar portaria\n5. Encerrar\n-> ", ("1", "2", "3", "4", "5"))
+        opcao = resposta[0]
+        if (opcao == "1"):
+            iniciar_modulo_termos(opcao)
+        elif (opcao == "5"):
+            print("Encerrando.")
+            break
     
 def CAPTURAR_RESPOSTA(mensagem, dado_esperado):
 
@@ -208,12 +201,5 @@ def CAPTURAR_RESPOSTA(mensagem, dado_esperado):
         PERGUNTA = input(mensagem).lower()
         
     return (PERGUNTA, True)
-
-def MENU():
-    while True:        
-        resposta = CAPTURAR_RESPOSTA("Bem vindo! Escolha dentre as opções \n1. Gerar termos aditivos\n2. Gerar relatório\n3. Atualizar número de protocolo\n4. Gerar portaria\n5. Encerrar\n-> ", ("1", "2", "3", "4", "5"))
-        if (resposta[1] == True):
-            break
-    return (resposta[0])
 
 MAIN()

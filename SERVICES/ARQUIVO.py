@@ -16,9 +16,6 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from datetime import date
 from docx.shared import Pt
 
-
-
-
 RELATORIO_INFO = []
 
 modelo_relatorio = pegar_modelos("relatorio")
@@ -48,21 +45,6 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, op):
                 print(verificacao["mensagem"])
                 return False 
                 
-                    
-                
-                
-                
-                #doc_intermediario.set_contratado(contratado)
-                #return gerenciador.verificarArquivo(f"{contratado} - AF {numero_af}.docx"), doc_intermediario
-                               
-            # 1. PRIMEIRO ABRE A PLANILHA E AVALIA SE A SHEET É UM NUMERO, SE FOR INICIA A ANÁLISE ok
-            # 2. SE NÃO EXISTIR, UTILIZAR O MAPEAMENTO PARA VERIFICAR SE AS INFORMAÇÕES VITAIS ESTÃO PREENCHIDAS
-            # 2. COMEÇA VERIFICANDO SE O ARQUIVO EXISTE NA PASTA MONTANDO UMA VARIÁVEL INTERMEDIÁRIA E TEMPORÁRIA ok
-            # 4. SE O MAPEAMENTO ESTIVER OK, INSTANCIAR OBJETO E INICIALIZAR O DOCUMENTO
-            
-            verificacao = verificar_informacoes_iniciais()
-            print(verificacao)
-
         def colher_informacoes_termo(doc):
             
             def customizar_mensagem(tipo):
@@ -79,7 +61,7 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, op):
             
             mensagem = customizar_mensagem(str(sheet[mapa['tipo_nota']].value))
             print(gerenciador.pasta_atual)
-            endereco = rf"{gerenciador.pasta_atual}\{doc.arq}.docx"
+            endereco = rf"{gerenciador.pasta_atual}\{doc.arq}"
             gestor = definir_gestor(gerenciador.tipo_arquivo)
             contrato = sheet[mapa['n_contrato']].value
             modelo_termo = pegar_modelos("termo")
@@ -89,21 +71,31 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, op):
             numero_af = doc.af 
             
             return Termo(contratado, endereco, ordem, contrato, objeto, numero_af, mensagem, gestor, tipo, modelo_termo)
-        
-        # Se não for encontrado um arquivo existente ou informações faltantes na planilha,
-        # 
+    
         doc_verificacao = verificar_informacoes_iniciais()
         
         if (doc_verificacao != False):
             termo = colher_informacoes_termo(doc_verificacao)
-            termo.criar_arquivo()                   
+            termo.criar_arquivo()    
+            termo.salvar_pdf()    
+    
+    def gerar_protocolo(sheet):
+        verificador = Verificador("", sheet)   
+        gerenciador.entrarEmPasta("WORD")
+        
+        def verificar_informacoes_iniciais():
+            verificacao = verificador.checar_campos_planilha()
+            if (verificacao["resultado"]):
+                pass
+        pass            
     PLANILHA = load_workbook(sheet_planilha, data_only= True)
 
     if (op == "1" or op == "2"):
         for ordem in (PLANILHA.sheetnames):
             if (ordem.isdigit() and op == "1"):
                 gerar_termos(PLANILHA[ordem], ordem)
-
+            else:
+                gerar_protocolo(PLANILHA[ordem])
     
     
     """

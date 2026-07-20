@@ -23,11 +23,9 @@ def CONVERTER_PARA_XLSX(arquivo):
         finally: 
             return arquivo_xlsx
             
-        
 def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(localizacao_planilha, nome_sheet, dados):
 
     ANALISE_FISCAL = load_workbook(localizacao_planilha)
-    
     
     def limpar_planilha(sheet):
         if sheet.max_row > 0:
@@ -36,7 +34,6 @@ def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(localizacao_planilha, nome_sheet, dado
     SHEET = ANALISE_FISCAL[nome_sheet]
     limpar_planilha(SHEET)
 
-    
     HEAD = []
     for keys in dados[0]:
         HEAD.append(keys)
@@ -45,7 +42,6 @@ def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(localizacao_planilha, nome_sheet, dado
     for linha in dados: 
         SHEET.append([linha.get(coluna, "") for coluna in HEAD])
         
-   
     ANALISE_FISCAL.save(localizacao_planilha)
 
     """
@@ -92,7 +88,7 @@ def INICIAR_PLANILHA(localizacao_planilha, gerenciador_arquivos, op):
     
     modified = datetime.fromtimestamp(os.path.getmtime(localizacao_planilha))
 
-    print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\nOUVINDO PLANILHA....\nAperte CTRL + C para encerrar a planilha")
+    print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\nOUVINDO PLANILHA....\nAperte CTRL + C para encerrar a planilha\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
     try:
         while True:
             time.sleep(1)
@@ -101,9 +97,8 @@ def INICIAR_PLANILHA(localizacao_planilha, gerenciador_arquivos, op):
             if (last_modified > modified):
                 PROCESSAR_ARQUIVO(localizacao_planilha, gerenciador_arquivos, op)
                 modified = datetime.fromtimestamp(os.path.getmtime(localizacao_planilha))     
-                gerenciador_arquivos.entrarEmPasta("..")
     except KeyboardInterrupt:
-        print("Encerrando...")
+        print("Encerrando...\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
     finally:
         wb.Close(SaveChanges=True)  
         excel.Quit()               

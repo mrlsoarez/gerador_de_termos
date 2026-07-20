@@ -18,8 +18,8 @@ class Verificador:
 
     def set_info(self):
         self.contratado = self.sheet[self.mapa['contratado']].value
-        self.af = self.sheet[self.mapa['numero_af']].value[:4] 
-        self.arq = f"{self.contratado} - AF {self.af}"
+        self.af = self.sheet[self.mapa['numero_af']].value
+        self.arq = f"{self.contratado} - AF {self.af[:4]}.docx"
         pass
     
     def checar_campos_planilha(self):
