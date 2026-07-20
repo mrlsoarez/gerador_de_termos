@@ -128,17 +128,17 @@ ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS()
 
 def MAIN():
     
-    #pergunta pra saber se eh ata/contrato
-    """
-    pergunta_inicial = CAPTURAR_RESPOSTA(
-        "Bem vindo ao gerador de termos! Escolha dentre as opções para gerar: \n1. Contrato\n2. Ata\n-> ", ("1", "2")
-    )
+    def iniciar_modulo_termos(op):
+        """
+        pergunta_inicial = CAPTURAR_RESPOSTA(
+            "Bem vindo ao gerador de termos! Escolha dentre as opções para gerar: \n1. Contrato\n2. Ata\n-> ", ("1", "2")
+        )
 
-    #pergunta pra saber se quer pegar os dados novos de empenho e liq
-    pergunta_update = CAPTURAR_RESPOSTA(
-        "Deseja atualizar os dados da planilha? (S/N) -> ", ("s", "n")
-    )
-    """
+        #pergunta pra saber se quer pegar os dados novos de empenho e liq
+        pergunta_update = CAPTURAR_RESPOSTA(
+            "Deseja atualizar os dados da planilha? (S/N) -> ", ("s", "n")
+        )
+        """
     
     
     # A coleta de dados externos oferece uma estrutura que envolve
@@ -147,38 +147,58 @@ def MAIN():
             # -> Inclusão dos servidores
         ## Futuramente, inclusão de JSON com os dados de ata
         
-    r"""
     
-    
-    
-    """
-    pergunta_inicial = "1"
-    pergunta_update = "s"
-    
-    TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)
-    PASTA_PLANILHA_ANALISE = pegar_planilha_termo(TIPO_TERMO["arquivo"])
-    
-    GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), TIPO_TERMO["tipo"])
-    GERENCIADOR_PASTAS.criar_pasta_termos()
-    
-    if (pergunta_update == "s"): 
+        pergunta_inicial = "1"
+        pergunta_update = "s"
         
-        print("Iniciando a coleta de dados externos..")
+        # realizando as tratativas inicias, criações de pastas e localização dos arquivos
+            # dependente da configuração correta do env
+        TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)
+        PASTA_PLANILHA_ANALISE = pegar_planilha_termo(TIPO_TERMO["arquivo"])
+        GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), TIPO_TERMO["tipo"])
+        GERENCIADOR_PASTAS.criar_pasta_termos()
         
-        dados_contratos = COLETAR_DADOS_EXTERNOS("contratos")
-        dados_servidores =  COLETAR_DADOS_EXTERNOS("servidores")
-        dados_empenhos = COLETAR_DADOS_EXTERNOS("empenhos")
-        dados_liquidacao =  COLETAR_DADOS_EXTERNOS("liquidacoes")
+        if (pergunta_update == ""): 
+            
+            print("Iniciando a coleta de dados externos.. por favor, aguarde..")
+            
+            try:
+                dados_contratos = COLETAR_DADOS_EXTERNOS("contratos")
+                dados_servidores =  COLETAR_DADOS_EXTERNOS("servidores")
+                dados_empenhos = COLETAR_DADOS_EXTERNOS("empenhos")
+                dados_liquidacao =  COLETAR_DADOS_EXTERNOS("liquidacoes")
+                pass
+            except: 
+                print("Algo deu errado no processo de busca de dados")
+            else:
+                print("Dados encontrados e armazenados para inserção nas planilhas")
+
+            print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+            print("Inserindo as informações na planilha de análise base.. favor, aguardar.")     
+            try: 
+                ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Base", dados_contratos)
+                ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Servidores", dados_servidores)
+                ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Empenhos", dados_empenhos)
+                ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Liquidacoes", dados_liquidacao)
+            except:
+                print("Algo deu errado no processo de inserir as informações nas planilhas")
+            else: 
+                print("Dados inseridos nas planilhas.")
+        
+        print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\nIniciando planilha..")
+        INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, op)
     
-        ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Base", dados_contratos)
-        ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Servidores", dados_servidores)
-        ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Empenhos", dados_empenhos)
-        ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Liquidacoes", dados_liquidacao)
-
-        return
-
-    INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS)
-
+    #opcao = MENU()
+    opcao = "1"
+    
+    if (opcao == "1"):
+        iniciar_modulo_termos(opcao)
+        print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+        MENU()
+    elif (opcao == "5"):
+        print("Encerrando programa.")
+        return 
+    
 def CAPTURAR_RESPOSTA(mensagem, dado_esperado):
 
     PERGUNTA = input(mensagem).lower()
@@ -187,6 +207,13 @@ def CAPTURAR_RESPOSTA(mensagem, dado_esperado):
         print(("Opção não válida, por favor, digite uma das opções ao lado ", dado_esperado))
         PERGUNTA = input(mensagem).lower()
         
-    return PERGUNTA
+    return (PERGUNTA, True)
+
+def MENU():
+    while True:        
+        resposta = CAPTURAR_RESPOSTA("Bem vindo! Escolha dentre as opções \n1. Gerar termos aditivos\n2. Gerar relatório\n3. Atualizar número de protocolo\n4. Gerar portaria\n5. Encerrar\n-> ", ("1", "2", "3", "4", "5"))
+        if (resposta[1] == True):
+            break
+    return (resposta[0])
 
 MAIN()

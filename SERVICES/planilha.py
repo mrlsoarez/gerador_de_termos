@@ -25,8 +25,9 @@ def CONVERTER_PARA_XLSX(arquivo):
             
         
 def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(localizacao_planilha, nome_sheet, dados):
-    
+
     ANALISE_FISCAL = load_workbook(localizacao_planilha)
+    
     
     def limpar_planilha(sheet):
         if sheet.max_row > 0:
@@ -46,6 +47,7 @@ def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(localizacao_planilha, nome_sheet, dado
         
    
     ANALISE_FISCAL.save(localizacao_planilha)
+
     """
 
 
@@ -81,23 +83,23 @@ def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(localizacao_planilha, nome_sheet, dado
 
     """
      
-def INICIAR_PLANILHA(localizacao_planilha, gerenciador_arquivos):
+def INICIAR_PLANILHA(localizacao_planilha, gerenciador_arquivos, op):
 
     excel = win32com.client.Dispatch("Excel.Application")
-
     excel.Visible = True
 
     wb = excel.Workbooks.Open(localizacao_planilha)
     
     modified = datetime.fromtimestamp(os.path.getmtime(localizacao_planilha))
 
+    print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\nOUVINDO PLANILHA....\nAperte CTRL + C para encerrar a planilha")
     try:
         while True:
             time.sleep(1)
             last_modified = os.path.getmtime(localizacao_planilha)
             last_modified = datetime.fromtimestamp(last_modified)
             if (last_modified > modified):
-                PROCESSAR_ARQUIVO(localizacao_planilha, gerenciador_arquivos)
+                PROCESSAR_ARQUIVO(localizacao_planilha, gerenciador_arquivos, op)
                 modified = datetime.fromtimestamp(os.path.getmtime(localizacao_planilha))     
                 gerenciador_arquivos.entrarEmPasta("..")
     except KeyboardInterrupt:

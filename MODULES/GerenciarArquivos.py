@@ -21,13 +21,14 @@ class GerenciarArquivos:
         if(navegar): os.chdir(nome_pasta)
 
     def entrarEmPasta(self, nome_pasta):
+        if (os.getcwd() == self.pasta_atual):
+            return
         os.chdir(nome_pasta)
         self.pasta_atual = rf"{self.pasta_atual}\{nome_pasta}"
         
     def verificarArquivo(self, arq):
         return os.path.exists(rf"{self.pasta_atual}/{arq}")
     
-    #### precisa sair daqui
     def criar_pasta_termos(self):
         
         mes_numero = EncontrarData("mes", False)

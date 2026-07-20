@@ -4,6 +4,7 @@ from MODULES.GerenciarArquivos import GerenciarArquivos
 from MODULES.EncontrarData import EncontrarData
 
 from ENV.environment import pegar_modelos
+from SERVICES.Classes.Documento import Documento
 
 import os
 import shutil
@@ -15,168 +16,64 @@ from datetime import date
 from docx.shared import Pt
 
 
-MAPEAMENTO = {
-    "contratado": "B4",
-    "n_contrato": "E4",
-    "objeto": "F4",
-    "numero_empenho": "A8",
-    "numero_liquidacao": "A12",
-    "data_liquidacao": "B12",
-    "valor_bruto_liquidacao": "C12",
-    "tipo_nota": "D16",
-    "numero_af": "A20",
-}
+
 
 RELATORIO_INFO = []
 
 modelo_termo = pegar_modelos("termo")
 modelo_relatorio = pegar_modelos("relatorio")
 
-class Documento: 
+# she was so happy to look a mess
+# affs
+def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, op):
     
-    endereco_protocolo = pegar_modelos("protocolo")
-    
-    def __init__(self, contratado):
-        self.contratado = contratado
-    
-    def copiar_arquivo(self, antigo, novo):
-        shutil.copy(antigo, novo)
-        
-    def mudar_fonte(texto, name_font):
-        texto.font.name = name_font
-    
-    def mudar_tamanho(texto, px): 
-        texto.font.size = Pt(px)
-
-    @staticmethod
-    def criar_texto(paragrafo, texto, negrito = False, posicionamento = None, px = None, fonte = None):
-
-        def deixar_negrito(run): 
-           run.bold = True 
-
-        def alinhar_texto(paragrafo, alinhado):
-            if (alinhado == "Centro"): 
-                paragrafo.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            elif (alinhado == "Direita"):
-                paragrafo.alignment = WD_ALIGN_PARAGRAPH.RIGHT 
-
-        run = paragrafo.add_run(str(texto))
-        if (negrito): deixar_negrito(run)
-        if (posicionamento != None): alinhar_texto(paragrafo, posicionamento)
-        if (px != None): Documento.mudar_tamanho(run, px)
-        if (fonte != None): Documento.mudar_fonte(run, fonte)
-
-    @staticmethod
-    def encontrar_data_de_hoje_em_extenso():  
-
-        dia = EncontrarData("dia")
-        mes = EncontrarData("mes", True)
-        ano = EncontrarData("ano")
-        
-        return f"{dia} de {mes} de {ano}"
-
-    @staticmethod
-    def adicionar_linha_de_assinatura(paragrafo, assinador): 
-        Documento.criar_texto(paragrafo, f"________________________________________\n{assinador}", negrito = True, posicionamento = "Centro", fonte = "Cambria")
-    
-    @staticmethod
-    def modificar_tabela(tabela, dados): 
-
-        for i in range(len(dados)):
-
-            dado = dados[i]
-                
-            celula = tabela.cell(dado["celula"][0], dado["celula"][1])
-            paragrafo = celula.paragraphs[0]  
-
-            Documento.criar_texto(paragrafo, dado["conteudo"], dado["negrito"], px = 10, fonte = "Cambria")
-
-        return tabela
-    
-    @staticmethod
-    def salvar_pdf(self):
-        pdf = self.endereco.replace("WORD", "PDF")
-        pdf = pdf.replace(".docx", ".pdf")
-        #convert(docx, pdf)
-        return pdf
-                   
-class Termo(Documento):
-    
-    def __init__(self, contratado, endereco, ordem, contrato, objeto, af, mensagem, tipo):
-        super().__init__(contratado)
-        self.ordem = ordem
-        self.endereco = endereco
-        self.contrato = contrato 
-        self.objeto = objeto 
-        self.af = af
-        self.mensagem = mensagem
-        self.tipo = tipo
-
-
-    def criar_arquivo(self, model):
-        
-        doc = Document(model)
-        
-        def definir_tabela(self):
-
-            if self.tipo.lower() == "ata":
-                campo = "ATA N°"
-            else:
-                campo = "CONTRATO N°" 
-
-            dados = [{"celula": (1, 0), "conteudo": campo, "negrito": True}, 
-                     {"celula": (1, 1), "conteudo": self.contrato, "negrito": False }, 
-                     {"celula": (2, 1), "conteudo": self.contratado, "negrito": False }, 
-                     {"celula": (3, 1), "conteudo": self.objeto, "negrito": False }, 
-                     {"celula": (4, 1), "conteudo": self.af, "negrito": False}, 
-                     {"celula": (6, 1), "conteudo": self.mensagem, "negrito": False }, 
-                    ]
+    # trabalha o relatorio e o termo aqui
+    def gerar_termos(sheet):
             
-            doc.tables[0] = Documento.modificar_tabela(doc.tables[0], dados)
-            
-        def definir_data(self):
-            data_texto = "BATAGUASSU/MS, " + Documento.encontrar_data_de_hoje_em_extenso()
-            Documento.criar_texto(doc.add_paragraph(), data_texto, negrito = True, posicionamento = "Direita")
-        
-        def adicionar_espaco(self, quant):
-            for i in range(quant):
-                doc.add_paragraph("")
-        
-        def definir_gestor(self):
-            print(self.tipo)
-            if self.tipo.lower() == "contrato":
-                Documento.adicionar_linha_de_assinatura(doc.add_paragraph(), "RONALDO DE SOUZA MARCÍLIO\nGESTOR DE CONTRATOS")
-            else:
-                Documento.adicionar_linha_de_assinatura(doc.add_paragraph(), "MURILO SOARES DE OLIVEIRA\nGESTOR DE ATAS")
+            # todos os dados da planilha precisam estar preenchidos para checar se arquivo existe
+            def verificar_se_arquivo_existe():
                 
-        definir_tabela(self)
-        definir_data(self)
-        adicionar_espaco(self, 3)
-        definir_gestor(self)
-        
-        return doc 
-    
-    def salvar_pdf(self):
-        docx = self.endereco
-        pdf = docx.replace("WORD", "PDF")
-        pdf = pdf.replace(".docx", ".pdf")
-        print(f"Convertendo termo para PDF.... *.✧*.✧.*.✧*.✧*.✧*.✧.,*.✧*. {self.contratado} - AF {self.af}")
-        convert(docx, pdf)
-        
-class Relatorio(Documento):
-    
-    def __init__(self, contratado, liquidacao, valor, data):
-        super().__init__(contratado)
-        self.liquidacao = liquidacao
-        self.valor = valor
-        self.data = data 
-
-# avaliar se existe a necessidade do gerenciador de pastas aqui
-def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador):
-    
+                doc_intermediario = Documento("")
+                mapa = doc_intermediario.get_mapeamento_termos()
+                
+                verificao = doc_intermediario.checar_campos_planilha(sheet)
+                
+                if (verificao[0] == False):
+                    print(f'{verificao[1]}')
+                    return 
+                
+                contratado = sheet[mapa['contratado']].value
+                numero_af = sheet[mapa['numero_af']].value[:4]
+                
+                doc_intermediario.set_contratado(contratado)
+                return gerenciador.verificarArquivo(f"{contratado} - AF {numero_af}.docx"), doc_intermediario
+                               
+            # 1. PRIMEIRO ABRE A PLANILHA E AVALIA SE A SHEET É UM NUMERO, SE FOR INICIA A ANÁLISE ok
+            # 2. COMEÇA VERIFICANDO SE O ARQUIVO EXISTE NA PASTA MONTANDO UMA VARIÁVEL INTERMEDIÁRIA E TEMPORÁRIA ok
+            # 3. SE NÃO EXISTIR, UTILIZAR O MAPEAMENTO PARA VERIFICAR SE AS INFORMAÇÕES VITAIS ESTÃO PREENCHIDAS
+            # 4. SE O MAPEAMENTO ESTIVER OK, INSTANCIAR OBJETO E INICIALIZAR O DOCUMENTO
+            
+            gerenciador.entrarEmPasta("WORD")
+            
+            verificacao_inicial = verificar_se_arquivo_existe()
+            
+            if (verificacao_inicial[0] == False):
+                DOC = verificacao_inicial[1]
+                print(DOC)
+                           
     PLANILHA = load_workbook(sheet_planilha, data_only= True)
+
+    if (op == "1" or op == "2"):
+        for ordem in (PLANILHA.sheetnames):
+            if (ordem.isdigit() and op == "1"):
+                gerar_termos(PLANILHA[ordem])
+         
     
-    gerenciador.entrarEmPasta("WORD")
+    
+    """
+    
+    
+    
     
     def instanciar_documento(sheet):
         return Documento(sheet[MAPEAMENTO['contratado']].value)
@@ -214,7 +111,7 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador):
         else: 
             pass
         
-            doc = instanciar_documento(PLANILHA[ordem])
+            
             RELATORIO_INFO.append(colher_informacoes_relatorio(doc.contratado, PLANILHA[ordem]))
             nome_arquivo = verificar_se_arquivo_existe(doc.contratado, PLANILHA[ordem])
             #nome_arquivo = "1. CENTRO AMERICA FROTAS LTDA - AF 1950"
@@ -231,15 +128,16 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador):
                     pass
                
                 
-                """
+                
                 ****** end_modelo needs to be in class
-                """
+                
             
                 #termo.copiar_arquivo(end_modelo, end_novo)
-                """
+                
                 ******
-                """
+            
                 pass
+    """
             
         
 
