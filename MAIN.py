@@ -1,9 +1,11 @@
 from ENV.environment import pegar_endereco_base, pegar_tipo_termo, pegar_planilha_termo, pegar_numero_protocolo
 from SERVICES.PLANILHA import ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS, INICIAR_PLANILHA
 from SERVICES.DADOS_EXTERNOS import COLETAR_DADOS_EXTERNOS
+
 from MODULES.GerenciarArquivos import GerenciarArquivos
+from MODULES.EncontrarData import EncontrarData
 
-
+import os 
 # lista de dependencias sao elas
 #win32
 #selenium
@@ -129,31 +131,39 @@ ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS()
 def MAIN():
     
     def iniciar_modulo_termos(op):
-        """
-        pergunta_inicial = CAPTURAR_RESPOSTA(
-            "Bem vindo ao gerador de termos! Escolha dentre as opções para gerar: \n1. Contrato\n2. Ata\n-> ", ("1", "2")
-        )
+        
+        def criar_pasta_termos(gerenciador):
+            
+            mes_numero = EncontrarData("mes", False)
+            mes_extenso = EncontrarData("mes", True) 
+            dia = EncontrarData("dia")
+        
+            os.chdir(gerenciador.pasta_base)
 
-        #pergunta pra saber se quer pegar os dados novos de empenho e liq
-        pergunta_update = CAPTURAR_RESPOSTA(
-            "Deseja atualizar os dados da planilha? (S/N) -> ", ("s", "n")
-        )
-        """
-        pergunta_inicial = "1"
-        pergunta_update = "s"
+            PASTA_MES = f"{mes_numero[1:]}. {mes_extenso}"
+            PASTA_DIA = f"{dia}-{mes_numero}"
+            PROTOCOLO = f"REMESSA X - PROTOCOLO N° {gerenciador.numero_protocolo}"
         
-        # realizando as tratativas inicias, criações de pastas e localização dos arquivos
-            # dependente da configuração correta do env
+            gerenciador.criarPasta(PASTA_MES, True)
+            gerenciador.criarPasta(PASTA_DIA, True)
+            gerenciador.criarPasta(PROTOCOLO, True)
+            gerenciador.criarPasta(gerenciador.tipo_arquivo, True)
+            gerenciador.criarPasta("WORD")
+            gerenciador.criarPasta("PDF")
         
-        TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)
-        PASTA_PLANILHA_ANALISE = pegar_planilha_termo(TIPO_TERMO["arquivo"])
-        GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), TIPO_TERMO["tipo"])
-        GERENCIADOR_PASTAS.criar_pasta_termos()
+            gerenciador.pasta_atual = rf"{gerenciador.pasta_base}\{PASTA_MES}\{PASTA_DIA}\{PROTOCOLO}\{gerenciador.tipo_arquivo}"
         
-        if (pergunta_update == ""): 
-            
+        def realizar_perguntas_iniciais():
+            pergunta_inicial = CAPTURAR_RESPOSTA(
+                "Bem vindo ao gerador de termos! Escolha dentre as opções para gerar: \n1. Contrato\n2. Ata\n-> ", ("1", "2")
+            )
+            pergunta_update = CAPTURAR_RESPOSTA(
+                "Deseja atualizar os dados da planilha? (S/N) -> ", ("s", "n")
+            )
+            return pergunta_inicial, pergunta_update 
+        
+        def capturar_dados_externos():
             print("Iniciando a coleta de dados externos.. por favor, aguarde..")
-            
             try:
                 dados_contratos = COLETAR_DADOS_EXTERNOS("contratos")
                 dados_servidores =  COLETAR_DADOS_EXTERNOS("servidores")
@@ -176,18 +186,42 @@ def MAIN():
                 print("Algo deu errado no processo de inserir as informações nas planilhas")
             else: 
                 print("Dados inseridos nas planilhas.")
+            
+        resposta = realizar_perguntas_iniciais()
+            
+        pergunta_inicial = resposta[0]
+        pergunta_update = resposta[1]
+            
+            #pergunta_inicial = "1"
+            #pergunta_update = "n"
+            
+            # realizando as tratativas inicias, criações de pastas e localização dos arquivos
+                # dependente da configuração correta do env
+            
+        TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)
+        PASTA_PLANILHA_ANALISE = pegar_planilha_termo(TIPO_TERMO["arquivo"])
+        GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), TIPO_TERMO["tipo"])
+            
+        criar_pasta_termos(GERENCIADOR_PASTAS)
         
+        if (pergunta_update == "s"): 
+            capturar_dados_externos()
+            
         print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\nIniciando planilha..")
-        INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, op)
-    
+        #INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, op)
+
     def iniciar_modulo_protocolo(op):
+        GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), )
         pass 
     
     while True:        
         resposta = CAPTURAR_RESPOSTA("Bem vindo! Escolha dentre as opções \n1. Gerar termos aditivos\n2. Gerar relatório\n3. Atualizar número de protocolo\n4. Gerar portaria\n5. Encerrar\n-> ", ("1", "2", "3", "4", "5"))
         opcao = resposta[0]
+        #opcao = "1"
         if (opcao == "1"):
             iniciar_modulo_termos(opcao)
+        elif (opcao == "2"):
+            iniciar_modulo_protocolo(opcao)
         elif (opcao == "5"):
             print("Encerrando.")
             break
