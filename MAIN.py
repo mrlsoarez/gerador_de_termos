@@ -186,7 +186,8 @@ def MAIN():
                 print("Algo deu errado no processo de inserir as informações nas planilhas")
             else: 
                 print("Dados inseridos nas planilhas.")
-            
+        
+        print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
         resposta = realizar_perguntas_iniciais()
             
         pergunta_inicial = resposta[0]
@@ -211,7 +212,28 @@ def MAIN():
         #INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, op)
 
     def iniciar_modulo_protocolo(op):
-        GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), )
+        
+        print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+        pergunta_inicial = CAPTURAR_RESPOSTA(
+            "Bem vindo ao gerador de RELATÓRIO! Escolha dentre as opções para gerar: \n1. Contrato\n2. Ata\n3. Ambos\n-> ", ("1", "2", "3")
+        )
+        
+        GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), "")
+        
+        def encontrar_pasta_de_protocolo(): 
+            print(GERENCIADOR_PASTAS.pasta_base)
+            pass 
+        encontrar_pasta_de_protocolo()
+        """
+        
+        if (pergunta_inicial[0] == "3"):
+            for i in range(1, 3):
+                TIPO_TERMO = pegar_tipo_termo(str(i))
+        
+        
+        TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)
+        GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), pergunta_inicial)
+        """
         pass 
     
     while True:        

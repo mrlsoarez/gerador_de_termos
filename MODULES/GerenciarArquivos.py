@@ -17,6 +17,12 @@ class GerenciarArquivos:
         self.pasta_base = pasta_base
         self.tipo_arquivo = tipo_arquivo
     
+    def set_pasta_base(self, pasta):
+        self.pasta_base = pasta 
+        
+    def set_tipo_arquivo(self, tipo):
+        self.tipo_arquivo = tipo 
+        
     def criarPasta(self, nome_pasta, navegar = False):
         os.makedirs(nome_pasta, exist_ok = "True")
         if(navegar): os.chdir(nome_pasta)
