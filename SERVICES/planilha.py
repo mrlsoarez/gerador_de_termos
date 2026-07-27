@@ -81,14 +81,19 @@ def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(localizacao_planilha, nome_sheet, dado
      
 def INICIAR_PLANILHA(localizacao_planilha, gerenciador_arquivos, op):
 
+    if (op == "2"): 
+        PROCESSAR_ARQUIVO(localizacao_planilha, gerenciador_arquivos, op)
+        return 
+    
     excel = win32com.client.Dispatch("Excel.Application")
     excel.Visible = True
 
     wb = excel.Workbooks.Open(localizacao_planilha)
-    
     modified = datetime.fromtimestamp(os.path.getmtime(localizacao_planilha))
 
     print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\nOUVINDO PLANILHA....\nAperte CTRL + C para encerrar a planilha\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+    
+    """
     try:
         while True:
             time.sleep(1)
@@ -102,4 +107,12 @@ def INICIAR_PLANILHA(localizacao_planilha, gerenciador_arquivos, op):
     finally:
         wb.Close(SaveChanges=True)  
         excel.Quit()               
-    
+    """
+
+"""
+
+def ABRIR_PLANILHA(localizacao_planilha):
+    ANALISE_FISCAL = load_workbook(localizacao_planilha) 
+    pass 
+
+"""

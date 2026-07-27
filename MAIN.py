@@ -132,6 +132,15 @@ def MAIN():
     
     def iniciar_modulo_termos(op):
         
+        def realizar_perguntas_iniciais():
+                    pergunta_inicial = CAPTURAR_RESPOSTA(
+                        "Bem vindo ao gerador de termos! Escolha dentre as opções para gerar: \n1. Contrato\n2. Ata\n-> ", ("1", "2")
+                    )
+                    pergunta_update = CAPTURAR_RESPOSTA(
+                        "Deseja atualizar os dados da planilha? (S/N) -> ", ("s", "n")
+                    )
+                    return pergunta_inicial, pergunta_update 
+                
         def criar_pasta_termos(gerenciador):
             
             mes_numero = EncontrarData("mes", False)
@@ -147,21 +156,13 @@ def MAIN():
             gerenciador.criarPasta(PASTA_MES, True)
             gerenciador.criarPasta(PASTA_DIA, True)
             gerenciador.criarPasta(PROTOCOLO, True)
+            gerenciador.criarPasta("PROTOCOLOS", False)
             gerenciador.criarPasta(gerenciador.tipo_arquivo, True)
             gerenciador.criarPasta("WORD")
             gerenciador.criarPasta("PDF")
         
             gerenciador.pasta_atual = rf"{gerenciador.pasta_base}\{PASTA_MES}\{PASTA_DIA}\{PROTOCOLO}\{gerenciador.tipo_arquivo}"
-        
-        def realizar_perguntas_iniciais():
-            pergunta_inicial = CAPTURAR_RESPOSTA(
-                "Bem vindo ao gerador de termos! Escolha dentre as opções para gerar: \n1. Contrato\n2. Ata\n-> ", ("1", "2")
-            )
-            pergunta_update = CAPTURAR_RESPOSTA(
-                "Deseja atualizar os dados da planilha? (S/N) -> ", ("s", "n")
-            )
-            return pergunta_inicial, pergunta_update 
-        
+           
         def capturar_dados_externos():
             print("Iniciando a coleta de dados externos.. por favor, aguarde..")
             try:
@@ -199,7 +200,7 @@ def MAIN():
             # realizando as tratativas inicias, criações de pastas e localização dos arquivos
                 # dependente da configuração correta do env
             
-        TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)
+        TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)[0]
         PASTA_PLANILHA_ANALISE = pegar_planilha_termo(TIPO_TERMO["arquivo"])
         GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), TIPO_TERMO["tipo"])
             
@@ -214,16 +215,39 @@ def MAIN():
     def iniciar_modulo_protocolo(op):
         
         print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+        
+        def entrar_na_pasta_de_protocolo():
+            mes_numero = EncontrarData("mes", False)
+            mes_extenso = EncontrarData("mes", True) 
+            dia = EncontrarData("dia")       
+            
+            PASTA_MES = f"{mes_numero[1:]}. {mes_extenso}"
+            PASTA_DIA = f"{dia}-{mes_numero}"
+            
+            GERENCIADOR_PASTAS.entrarEmPasta(f"{GERENCIADOR_PASTAS.pasta_base}\{PASTA_MES}\{PASTA_DIA}\REMESSA X - PROTOCOLO N° {GERENCIADOR_PASTAS.numero_protocolo}\PROTOCOLOS")
+        
+        def gerar_protocolo(pergunta_inicial):
+            TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)
+            for i in range(len(TIPO_TERMO)):
+                PASTA_PLANILHA_ANALISE = pegar_planilha_termo(TIPO_TERMO[i]["arquivo"])
+                GERENCIADOR_PASTAS.set_tipo_arquivo = TIPO_TERMO[i]["tipo"]
+                INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, op)
+            
+            
+        GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), "")
+        entrar_na_pasta_de_protocolo()        
+        gerar_protocolo("2")
+        """
+        
         pergunta_inicial = CAPTURAR_RESPOSTA(
-            "Bem vindo ao gerador de RELATÓRIO! Escolha dentre as opções para gerar: \n1. Contrato\n2. Ata\n3. Ambos\n-> ", ("1", "2", "3")
+            "Deseja gerar relatórios de quais informações?: \n1. Contrato\n2. Ata\n3. Ambos\n-> ", ("1", "2", "3")
         )
         
-        GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), "")
+        """
         
-        def encontrar_pasta_de_protocolo(): 
-            print(GERENCIADOR_PASTAS.pasta_base)
-            pass 
-        encontrar_pasta_de_protocolo()
+    
+         
+    
         """
         
         if (pergunta_inicial[0] == "3"):

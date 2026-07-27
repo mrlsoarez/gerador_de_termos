@@ -10,9 +10,13 @@ def pegar_planilha_termo(arquivo):
     return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\INFO\BASE\{arquivo}"
     
 def pegar_tipo_termo(prompt):
-    if (prompt == "2"): 
-        return {"tipo": "ATA", "arquivo": "ANÁLISE FISCAL - ATA.xlsx"} 
-    return {"tipo": "CONTRATO", "arquivo": "ANÁLISE FISCAL2.xlsx"}
+    if (prompt == "1"): 
+        return [{"tipo": "ATA", "arquivo": "ANÁLISE FISCAL - ATA.xlsx"}]
+    elif (prompt == "2"):
+        return [{"tipo": "CONTRATO", "arquivo": "ANÁLISE FISCAL2.xlsx"}]
+    else: 
+        return [{"tipo": "ATA", "arquivo": "ANÁLISE FISCAL - ATA.xlsx"},  {"tipo": "CONTRATO", "arquivo": "ANÁLISE FISCAL2.xlsx"}] 
+    
            
 def pegar_numero_protocolo():
     fonte = TXT_PROTOCOLO

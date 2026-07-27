@@ -4,7 +4,7 @@ from MODULES.GerenciarArquivos import GerenciarArquivos
 from MODULES.EncontrarData import EncontrarData
 
 from ENV.environment import pegar_modelos
-from SERVICES.Classes.Documento import Documento, Termo
+from SERVICES.Classes.Documento import Documento, Termo, Relatorio
 from SERVICES.Classes.Verificador import Verificador 
 
 import os
@@ -24,7 +24,6 @@ modelo_relatorio = pegar_modelos("relatorio")
 # affs
 def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, op):
     
-    # trabalha o relatorio e o termo aqui
     def gerar_termos(sheet, ordem):
                 
         verificador = Verificador("", sheet)   
@@ -60,7 +59,6 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, op):
             mapa = verificador.mapa 
             
             mensagem = customizar_mensagem(str(sheet[mapa['tipo_nota']].value))
-            print(gerenciador.pasta_atual)
             endereco = rf"{gerenciador.pasta_atual}\{doc.arq}"
             gestor = definir_gestor(gerenciador.tipo_arquivo)
             contrato = sheet[mapa['n_contrato']].value
@@ -80,22 +78,54 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, op):
             termo.salvar_pdf()    
     
     def gerar_protocolo(sheet):
+        
         verificador = Verificador("", sheet)   
-        gerenciador.entrarEmPasta("WORD")
+        RELATORIO = []
         
         def verificar_informacoes_iniciais():
             verificacao = verificador.checar_campos_planilha()
+            doc = ""
             if (verificacao["resultado"]):
-                pass
+                doc = Documento(verificador.contratado)
+            else:
+                print(verificacao["mensagem"])
+            return verificacao["resultado"], doc 
+        
+        def colher_informacao_relatorio(doc):
+                    
+            mapa = verificador.mapa         
+                        
+            contratado = doc.contratado
+            liquidacao = sheet[mapa['numero_liquidacao']].value
+            data = sheet[mapa['data_liquidacao']].value 
+            valor = sheet[mapa['valor_bruto_liquidacao']].value 
+            modelo_termo = pegar_modelos("protocolo")
+            
+            return Relatorio(contratado, liquidacao, data, valor, modelo_termo)
+        
+        def copiar_relatorio():
+            protocolo = rf'{gerenciador.pasta_atual}\REMESSA X - PROTOCOLO N° {gerenciador.numero_protocolo}.docx'
+            print(protocolo, gerenciador.verificarArquivo(protocolo))
+                    
+            
+        verificacao = verificar_informacoes_iniciais()
+        
+        if (verificacao[0]):
+            doc = verificacao[1]
+            relatorio = colher_informacao_relatorio(doc)
+            copiar_relatorio()
+          
+            #RELATORIO_INFO.append(colher_informacao_relatorio(doc))
         pass            
+    
     PLANILHA = load_workbook(sheet_planilha, data_only= True)
 
-    if (op == "1" or op == "2"):
-        for ordem in (PLANILHA.sheetnames):
-            if (ordem.isdigit() and op == "1"):
-                gerar_termos(PLANILHA[ordem], ordem)
-            else:
-                gerar_protocolo(PLANILHA[ordem])
+
+    for ordem in (PLANILHA.sheetnames):
+        if (ordem.isdigit() and op == "1"):
+            gerar_termos(PLANILHA[ordem], ordem)
+        elif (ordem.isdigit() and op == "2"):
+            gerar_protocolo(PLANILHA[ordem])
     
     
     """

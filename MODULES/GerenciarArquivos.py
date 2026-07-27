@@ -32,6 +32,7 @@ class GerenciarArquivos:
             os.chdir(nome_pasta)
             self.pasta_atual = rf"{self.pasta_atual}\{nome_pasta}"
         except: 
+            print("Não foi possível entrar na pasta!")
             pass
         
     def verificarArquivo(self, arq):

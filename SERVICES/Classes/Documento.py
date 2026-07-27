@@ -153,8 +153,9 @@ class Termo(Documento):
         convert(docx, pdf)
         
 class Relatorio(Documento):
-    def __init__(self, contratado, liquidacao, valor, data):
+    def __init__(self, contratado, liquidacao, valor, data, modelo):
         super().__init__(contratado)
         self.liquidacao = liquidacao
         self.valor = valor
         self.data = data 
+        self.modelo = modelo
