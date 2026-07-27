@@ -224,14 +224,14 @@ def MAIN():
             PASTA_MES = f"{mes_numero[1:]}. {mes_extenso}"
             PASTA_DIA = f"{dia}-{mes_numero}"
             
-            GERENCIADOR_PASTAS.entrarEmPasta(f"{GERENCIADOR_PASTAS.pasta_base}\{PASTA_MES}\{PASTA_DIA}\REMESSA X - PROTOCOLO N° {GERENCIADOR_PASTAS.numero_protocolo}\PROTOCOLOS")
-        
+            GERENCIADOR_PASTAS.entrarEmPasta(fr"{PASTA_MES}\{PASTA_DIA}\REMESSA X - PROTOCOLO N° {GERENCIADOR_PASTAS.numero_protocolo}\PROTOCOLOS")
+            
         def gerar_protocolo(pergunta_inicial):
             TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)
             for i in range(len(TIPO_TERMO)):
                 PASTA_PLANILHA_ANALISE = pegar_planilha_termo(TIPO_TERMO[i]["arquivo"])
                 GERENCIADOR_PASTAS.set_tipo_arquivo = TIPO_TERMO[i]["tipo"]
-                INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, op)
+                INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, op, True)
             
             
         GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), "")

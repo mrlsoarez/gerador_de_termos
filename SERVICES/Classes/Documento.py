@@ -6,10 +6,12 @@ from MODULES.EncontrarData import EncontrarData
 
 from ENV.environment import pegar_modelos
 
-import os
 import shutil
+import locale
+
 from docx import Document
 from docx2pdf import convert
+from copy import deepcopy
 
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from datetime import date
@@ -17,8 +19,6 @@ from docx.shared import Pt
 
 
 class Documento: 
-
-    endereco_protocolo = pegar_modelos("protocolo")
     
     def __init__(self, contratado):
         self.contratado = contratado
@@ -104,7 +104,6 @@ class Termo(Documento):
         self.tipo = tipo
         self.modelo = modelo 
 
-
     def criar_arquivo(self):
         
         doc = Document(self.modelo)
@@ -153,9 +152,52 @@ class Termo(Documento):
         convert(docx, pdf)
         
 class Relatorio(Documento):
-    def __init__(self, contratado, liquidacao, valor, data, modelo):
+    def __init__(self, contratado, liquidacao, valor, data, modelo, protocolo, endereco):
         super().__init__(contratado)
         self.liquidacao = liquidacao
         self.valor = valor
         self.data = data 
         self.modelo = modelo
+        self.protocolo = protocolo
+        self.endereco = endereco
+    
+    def criar_arquivo(self, doc, termos):
+        
+        def converter_currency(self, valor):
+            locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
+            return locale.currency(float(valor), grouping =True)
+                    
+        def adicionar_protocolo(self):
+            substituir_protocolo = doc.paragraphs[1]
+            substituir_protocolo.text = ""
+            Documento.criar_texto(substituir_protocolo, f"PROTOCOLO DE RECEBIMENTO - NÚMERO {self.protocolo}", negrito = True)
+               
+        def criar_tabela(self, termos):
+            
+            def limpar_tabela(tabela):
+                while len(tabela.rows) > 1:
+                    tr = tabela.rows[1]._tr
+                    tr.getparent().remove(tr)
+                    
+            limpar_tabela(doc.tables[0])
+            
+            for i in range(len(termos)):
+                
+                tabela = doc.tables[0]   
+                nova_linha = tabela.add_row()
+                                
+                coluna_um = nova_linha.cells[0].paragraphs[0]
+                coluna_dois = nova_linha.cells[1].paragraphs[0]
+                coluna_tres = nova_linha.cells[2].paragraphs[0]
+                coluna_quatro = nova_linha.cells[3].paragraphs[0]
+                                    
+                Documento.criar_texto(coluna_um, termos[i].contratado,  px = 8, negrito = True, fonte = "Arial")
+                Documento.criar_texto(coluna_dois, termos[i].liquidacao,  px = 8, negrito = True, fonte = "Arial")
+                Documento.criar_texto(coluna_tres, termos[i].data,  px = 8, negrito = True, fonte = "Arial")
+                Documento.criar_texto(coluna_quatro, converter_currency(self, termos[i].valor),  px = 8, negrito = True, fonte = "Arial")
+                                   
+    
+        adicionar_protocolo(self) 
+        criar_tabela(self, termos)
+        
+        doc.save(self.endereco)

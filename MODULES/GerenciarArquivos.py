@@ -29,8 +29,8 @@ class GerenciarArquivos:
 
     def entrarEmPasta(self, nome_pasta):
         try:
-            os.chdir(nome_pasta)
-            self.pasta_atual = rf"{self.pasta_atual}\{nome_pasta}"
+            self.pasta_atual = rf"{self.pasta_base}\{nome_pasta}"
+            os.chdir(self.pasta_atual)
         except: 
             print("Não foi possível entrar na pasta!")
             pass

@@ -16,13 +16,14 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from datetime import date
 from docx.shared import Pt
 
-RELATORIO_INFO = []
+RELATORIO_INFO_GLOBAL = []
+protocolo_existe = False 
 
 modelo_relatorio = pegar_modelos("relatorio")
 
 # she was so happy to look a mess
 # affs
-def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, op):
+def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, op, mesmo_protocolo = False):
     
     def gerar_termos(sheet, ordem):
                 
@@ -75,59 +76,67 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, op):
         if (doc_verificacao != False):
             termo = colher_informacoes_termo(doc_verificacao)
             termo.criar_arquivo()    
-            termo.salvar_pdf()    
+            termo.salvar_pdf()     
     
     def gerar_protocolo(sheet):
         
         verificador = Verificador("", sheet)   
-        RELATORIO = []
         
         def verificar_informacoes_iniciais():
             verificacao = verificador.checar_campos_planilha()
-            doc = ""
+       
             if (verificacao["resultado"]):
-                doc = Documento(verificador.contratado)
-            else:
-                print(verificacao["mensagem"])
-            return verificacao["resultado"], doc 
+                return True
+            
+            print(verificacao["mensagem"])
         
-        def colher_informacao_relatorio(doc):
+        def colher_informacao_relatorio():
                     
             mapa = verificador.mapa         
                         
-            contratado = doc.contratado
+            contratado = sheet[mapa['contratado']].value
             liquidacao = sheet[mapa['numero_liquidacao']].value
             data = sheet[mapa['data_liquidacao']].value 
             valor = sheet[mapa['valor_bruto_liquidacao']].value 
             modelo_termo = pegar_modelos("protocolo")
+            endereco = rf"{gerenciador.pasta_atual}\Protocolo N° {gerenciador.numero_protocolo} - Tesouraria.docx"
             
-            return Relatorio(contratado, liquidacao, data, valor, modelo_termo)
+            return Relatorio(contratado, liquidacao, valor, data, modelo_termo, gerenciador.numero_protocolo, endereco)
         
-        def copiar_relatorio():
-            protocolo = rf'{gerenciador.pasta_atual}\REMESSA X - PROTOCOLO N° {gerenciador.numero_protocolo}.docx'
-            print(protocolo, gerenciador.verificarArquivo(protocolo))
-                    
-            
+        def copiar_relatorio(rel):
+            protocolo = rf'Protocolo N° {gerenciador.numero_protocolo} - Tesouraria.docx'
+            if (gerenciador.verificarArquivo(protocolo)):
+                protocolo_existe = True 
+                return 
+            rel.copiar_arquivo(rel.modelo, rf"{gerenciador.pasta_atual}/{protocolo}")
+ 
         verificacao = verificar_informacoes_iniciais()
         
-        if (verificacao[0]):
-            doc = verificacao[1]
-            relatorio = colher_informacao_relatorio(doc)
-            copiar_relatorio()
-          
-            #RELATORIO_INFO.append(colher_informacao_relatorio(doc))
-        pass            
+        if (verificacao):
+            relatorio = colher_informacao_relatorio()
+            if (not protocolo_existe): copiar_relatorio(relatorio)
+            if (mesmo_protocolo): 
+                RELATORIO_INFO_GLOBAL.append(colher_informacao_relatorio())
+            else:
+                RELATORIO_INFO.append(colher_informacao_relatorio())
+        pass         
     
     PLANILHA = load_workbook(sheet_planilha, data_only= True)
-
-
+    RELATORIO_INFO = []
+    
     for ordem in (PLANILHA.sheetnames):
         if (ordem.isdigit() and op == "1"):
             gerar_termos(PLANILHA[ordem], ordem)
         elif (ordem.isdigit() and op == "2"):
             gerar_protocolo(PLANILHA[ordem])
-    
-    
+     
+    if (op == "2"):
+        if (mesmo_protocolo):
+            rel = RELATORIO_INFO_GLOBAL
+        else:
+            rel = RELATORIO_INFO
+        rel[0].criar_arquivo(Document(rel[0].endereco), rel)
+
     """
     
     
