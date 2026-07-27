@@ -79,11 +79,11 @@ def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(localizacao_planilha, nome_sheet, dado
 
     """
      
-def INICIAR_PLANILHA(localizacao_planilha, gerenciador_arquivos, op, mesmo_protocolo):
+def INICIAR_PLANILHA(localizacao_planilha, gerenciador_arquivos, op, ARR):
 
     if (op == "2"): 
-        PROCESSAR_ARQUIVO(localizacao_planilha, gerenciador_arquivos, op, mesmo_protocolo)
-        return 
+        planilha = PROCESSAR_ARQUIVO(localizacao_planilha, gerenciador_arquivos, op, ARR)
+        return planilha
     
     excel = win32com.client.Dispatch("Excel.Application")
     excel.Visible = True

@@ -5,6 +5,8 @@ from SERVICES.DADOS_EXTERNOS import COLETAR_DADOS_EXTERNOS
 from MODULES.GerenciarArquivos import GerenciarArquivos
 from MODULES.EncontrarData import EncontrarData
 
+from docx import Document
+
 import os 
 # lista de dependencias sao elas
 #win32
@@ -210,7 +212,7 @@ def MAIN():
             capturar_dados_externos()
             
         print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\nIniciando planilha..")
-        #INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, op)
+        #INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, op, ARR = None)
 
     def iniciar_modulo_protocolo(op):
         
@@ -227,11 +229,21 @@ def MAIN():
             GERENCIADOR_PASTAS.entrarEmPasta(fr"{PASTA_MES}\{PASTA_DIA}\REMESSA X - PROTOCOLO N° {GERENCIADOR_PASTAS.numero_protocolo}\PROTOCOLOS")
             
         def gerar_protocolo(pergunta_inicial):
+            # Precisa retornar um Array e esse Array será utilizado para construir o documento.
+                # Documento é inicializado do zero e a tabela é preenchida com os dados do Array.
+                # O array está pronto quando todas as planilhas tiveram sua leitura finalizada. 
+            ARRAY = []
             TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)
             for i in range(len(TIPO_TERMO)):
                 PASTA_PLANILHA_ANALISE = pegar_planilha_termo(TIPO_TERMO[i]["arquivo"])
                 GERENCIADOR_PASTAS.set_tipo_arquivo = TIPO_TERMO[i]["tipo"]
-                INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, op, True)
+                ARRAY = INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, op, ARRAY)
+            
+            protocolo = ARRAY[0]
+            
+            protocolo.copiar_arquivo(protocolo.modelo, protocolo.endereco)
+            # this can be fixed btw
+            protocolo.criar_arquivo(Document(protocolo.endereco), ARRAY)
             
             
         GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), "")

@@ -174,13 +174,6 @@ class Relatorio(Documento):
                
         def criar_tabela(self, termos):
             
-            def limpar_tabela(tabela):
-                while len(tabela.rows) > 1:
-                    tr = tabela.rows[1]._tr
-                    tr.getparent().remove(tr)
-                    
-            limpar_tabela(doc.tables[0])
-            
             for i in range(len(termos)):
                 
                 tabela = doc.tables[0]   

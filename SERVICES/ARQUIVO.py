@@ -16,14 +16,13 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from datetime import date
 from docx.shared import Pt
 
-RELATORIO_INFO_GLOBAL = []
 protocolo_existe = False 
 
 modelo_relatorio = pegar_modelos("relatorio")
 
 # she was so happy to look a mess
 # affs
-def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, op, mesmo_protocolo = False):
+def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, op, ARR):
     
     def gerar_termos(sheet, ordem):
                 
@@ -114,28 +113,21 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, op, mesmo_protocolo = False):
         
         if (verificacao):
             relatorio = colher_informacao_relatorio()
-            if (not protocolo_existe): copiar_relatorio(relatorio)
-            if (mesmo_protocolo): 
-                RELATORIO_INFO_GLOBAL.append(colher_informacao_relatorio())
-            else:
-                RELATORIO_INFO.append(colher_informacao_relatorio())
+            #if (not protocolo_existe): copiar_relatorio(relatorio)
+            ARR.append(colher_informacao_relatorio())
         pass         
     
     PLANILHA = load_workbook(sheet_planilha, data_only= True)
-    RELATORIO_INFO = []
     
     for ordem in (PLANILHA.sheetnames):
         if (ordem.isdigit() and op == "1"):
             gerar_termos(PLANILHA[ordem], ordem)
         elif (ordem.isdigit() and op == "2"):
             gerar_protocolo(PLANILHA[ordem])
-     
+    
     if (op == "2"):
-        if (mesmo_protocolo):
-            rel = RELATORIO_INFO_GLOBAL
-        else:
-            rel = RELATORIO_INFO
-        rel[0].criar_arquivo(Document(rel[0].endereco), rel)
+        return ARR
+
 
     """
     
