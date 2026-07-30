@@ -16,6 +16,7 @@ class GerenciarArquivos:
     def __init__(self, pasta_base, tipo_arquivo):
         self.pasta_base = pasta_base
         self.tipo_arquivo = tipo_arquivo
+        self.pasta_atual = pasta_base
     
     def set_pasta_base(self, pasta):
         self.pasta_base = pasta 
@@ -28,12 +29,14 @@ class GerenciarArquivos:
         if(navegar): os.chdir(nome_pasta)
 
     def entrarEmPasta(self, nome_pasta):
+        BACKUP = self.pasta_atual
         try:
-            self.pasta_atual = rf"{self.pasta_base}\{nome_pasta}"
+            self.pasta_atual = rf"{self.pasta_atual}\{nome_pasta}"
             os.chdir(self.pasta_atual)
+            return True
         except: 
-            print("Não foi possível entrar na pasta!")
-            pass
+            self.pasta_atual = BACKUP
+            return False
         
     def verificarArquivo(self, arq):
         return os.path.exists(rf"{self.pasta_atual}/{arq}")

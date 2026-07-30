@@ -135,13 +135,16 @@ def MAIN():
     def iniciar_modulo_termos(op):
         
         def realizar_perguntas_iniciais():
-                    pergunta_inicial = CAPTURAR_RESPOSTA(
-                        "Bem vindo ao gerador de termos! Escolha dentre as opções para gerar: \n1. Contrato\n2. Ata\n-> ", ("1", "2")
-                    )
-                    pergunta_update = CAPTURAR_RESPOSTA(
-                        "Deseja atualizar os dados da planilha? (S/N) -> ", ("s", "n")
-                    )
-                    return pergunta_inicial, pergunta_update 
+            pergunta_inicial = CAPTURAR_RESPOSTA(
+                "Bem vindo ao gerador de termos! Escolha dentre as opções para gerar: \n1. Contrato\n2. Ata\n-> ", ("1", "2")
+            )
+            pergunta_update = CAPTURAR_RESPOSTA(
+                "Deseja atualizar os dados da planilha? (S/N) -> ", ("s", "n")
+            )
+            pergunta_total = CAPTURAR_RESPOSTA(
+                "Deseja uma geração total? (S/N) -> ", ("s", "n")
+            )
+            return pergunta_inicial, pergunta_update, pergunta_total
                 
         def criar_pasta_termos(gerenciador):
             
@@ -159,19 +162,20 @@ def MAIN():
             gerenciador.criarPasta(PASTA_DIA, True)
             gerenciador.criarPasta(PROTOCOLO, True)
             gerenciador.criarPasta("PROTOCOLOS", False)
+            gerenciador.criarPasta("TERMOS", True)
             gerenciador.criarPasta(gerenciador.tipo_arquivo, True)
             gerenciador.criarPasta("WORD")
             gerenciador.criarPasta("PDF")
         
-            gerenciador.pasta_atual = rf"{gerenciador.pasta_base}\{PASTA_MES}\{PASTA_DIA}\{PROTOCOLO}\{gerenciador.tipo_arquivo}"
+            gerenciador.pasta_atual = rf"{gerenciador.pasta_base}\{PASTA_MES}\{PASTA_DIA}\{PROTOCOLO}\TERMOS\{gerenciador.tipo_arquivo}"
            
-        def capturar_dados_externos():
+        def capturar_dados_externos(option):
             print("Iniciando a coleta de dados externos.. por favor, aguarde..")
             try:
-                dados_contratos = COLETAR_DADOS_EXTERNOS("contratos")
+                if (option == "1"): dados_contratos = COLETAR_DADOS_EXTERNOS("contratos")
                 dados_servidores =  COLETAR_DADOS_EXTERNOS("servidores")
-                dados_empenhos = COLETAR_DADOS_EXTERNOS("empenhos")
-                dados_liquidacao =  COLETAR_DADOS_EXTERNOS("liquidacoes")
+                #dados_empenhos = COLETAR_DADOS_EXTERNOS("empenhos")
+                #dados_liquidacao =  COLETAR_DADOS_EXTERNOS("liquidacoes")
                 pass
             except: 
                 print("Algo deu errado no processo de busca de dados")
@@ -181,27 +185,27 @@ def MAIN():
             print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
             print("Inserindo as informações na planilha de análise base.. favor, aguardar.")     
             try: 
-                ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Base", dados_contratos)
+                if (option == "1"): ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Base", dados_contratos)
                 ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Servidores", dados_servidores)
-                ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Empenhos", dados_empenhos)
-                ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Liquidacoes", dados_liquidacao)
+                #ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Empenhos", dados_empenhos)
+                #ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Liquidacoes", dados_liquidacao)
             except:
                 print("Algo deu errado no processo de inserir as informações nas planilhas")
             else: 
                 print("Dados inseridos nas planilhas.")
         
-        print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
-        resposta = realizar_perguntas_iniciais()
+        print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+        
+        #resposta = realizar_perguntas_iniciais()
             
-        pergunta_inicial = resposta[0]
-        pergunta_update = resposta[1]
+        #pergunta_inicial = resposta[0][0]
+        #pergunta_update = resposta[1][0]
+        #pergunta_total = resposta[2][0]
             
-            #pergunta_inicial = "1"
-            #pergunta_update = "n"
-            
-            # realizando as tratativas inicias, criações de pastas e localização dos arquivos
-                # dependente da configuração correta do env
-            
+        pergunta_inicial = "2"
+        pergunta_update = "s"
+        pergunta_total = "n"
+                    
         TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)[0]
         PASTA_PLANILHA_ANALISE = pegar_planilha_termo(TIPO_TERMO["arquivo"])
         GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), TIPO_TERMO["tipo"])
@@ -209,10 +213,15 @@ def MAIN():
         criar_pasta_termos(GERENCIADOR_PASTAS)
         
         if (pergunta_update == "s"): 
-            capturar_dados_externos()
-            
-        print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\nIniciando planilha..")
-        #INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, op, ARR = None)
+            capturar_dados_externos(pergunta_inicial)
+
+        parametros = {
+            "op": op, 
+            "modo_total": True if pergunta_total == "s" else False
+        }
+        
+        print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\nIniciando planilha..")
+        #INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, parametros)
 
     def iniciar_modulo_protocolo(op):
         
@@ -226,36 +235,43 @@ def MAIN():
             PASTA_MES = f"{mes_numero[1:]}. {mes_extenso}"
             PASTA_DIA = f"{dia}-{mes_numero}"
             
-            GERENCIADOR_PASTAS.entrarEmPasta(fr"{PASTA_MES}\{PASTA_DIA}\REMESSA X - PROTOCOLO N° {GERENCIADOR_PASTAS.numero_protocolo}\PROTOCOLOS")
+            return  GERENCIADOR_PASTAS.entrarEmPasta(fr"{PASTA_MES}\{PASTA_DIA}\REMESSA X - PROTOCOLO N° {GERENCIADOR_PASTAS.numero_protocolo}\PROTOCOLOS")
             
         def gerar_protocolo(pergunta_inicial):
-            # Precisa retornar um Array e esse Array será utilizado para construir o documento.
-                # Documento é inicializado do zero e a tabela é preenchida com os dados do Array.
-                # O array está pronto quando todas as planilhas tiveram sua leitura finalizada. 
+ 
             ARRAY = []
             TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)
+            
+            parametros = {
+                "op": op, 
+                "ARR": ARRAY
+            }
+            
             for i in range(len(TIPO_TERMO)):
                 PASTA_PLANILHA_ANALISE = pegar_planilha_termo(TIPO_TERMO[i]["arquivo"])
                 GERENCIADOR_PASTAS.set_tipo_arquivo = TIPO_TERMO[i]["tipo"]
-                ARRAY = INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, op, ARRAY)
+                ARRAY = INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, parametros)
             
+            print(ARRAY)
             protocolo = ARRAY[0]
             
             protocolo.copiar_arquivo(protocolo.modelo, protocolo.endereco)
-            # this can be fixed btw
-            protocolo.criar_arquivo(Document(protocolo.endereco), ARRAY)
-            
+            protocolo.criar_arquivo(ARRAY)
             
         GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), "")
-        entrar_na_pasta_de_protocolo()        
-        gerar_protocolo("2")
-        """
+        
+        if (not entrar_na_pasta_de_protocolo()):
+            print("Pasta de relatório ainda não existe!")
+            return 
         
         pergunta_inicial = CAPTURAR_RESPOSTA(
             "Deseja gerar relatórios de quais informações?: \n1. Contrato\n2. Ata\n3. Ambos\n-> ", ("1", "2", "3")
         )
         
-        """
+        gerar_protocolo(pergunta_inicial)
+        
+        
+      
         
     
          
@@ -275,7 +291,6 @@ def MAIN():
     while True:        
         resposta = CAPTURAR_RESPOSTA("Bem vindo! Escolha dentre as opções \n1. Gerar termos aditivos\n2. Gerar relatório\n3. Atualizar número de protocolo\n4. Gerar portaria\n5. Encerrar\n-> ", ("1", "2", "3", "4", "5"))
         opcao = resposta[0]
-        #opcao = "1"
         if (opcao == "1"):
             iniciar_modulo_termos(opcao)
         elif (opcao == "2"):

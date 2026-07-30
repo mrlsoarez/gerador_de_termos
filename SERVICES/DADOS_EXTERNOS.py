@@ -158,6 +158,7 @@ def COLETAR_DADOS_EXTERNOS_JSON(param):
     
     def buscar_dados(url, json, dados_planilha):
         response = session.get(url, params=json)
+        print(response)
         dados_extraidos = response.json()
         #A função abaixo possui a função de relacionar os dados com as células da planilha
         dados_tratados = realizar_tratativa_nos_dados(url, dados_planilha, dados_extraidos)
@@ -182,6 +183,7 @@ def COLETAR_DADOS_EXTERNOS_JSON(param):
         return dados_tratados
     
     dados_tratados = buscar_dados(param["url"], param["json"], param["dados_para_planilha"])
+    print(dados_tratados)
     return dados_tratados
 
 def COLETAR_DADOS_EXTERNOS_XLSX(param):

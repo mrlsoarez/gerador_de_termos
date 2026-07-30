@@ -22,13 +22,14 @@ modelo_relatorio = pegar_modelos("relatorio")
 
 # she was so happy to look a mess
 # affs
-def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, op, ARR):
+def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, param):
+    
+    OPTION = param["op"]
     
     def gerar_termos(sheet, ordem):
                 
         verificador = Verificador("", sheet)   
-        gerenciador.entrarEmPasta("WORD")
-        
+
         def verificar_informacoes_iniciais():
             verificacao = verificador.checar_campos_planilha()
             
@@ -77,13 +78,11 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, op, ARR):
             termo.criar_arquivo()    
             termo.salvar_pdf()     
     
-    def gerar_protocolo(sheet):
+    def buscar_informacoes_protocolo(sheet):
         
         verificador = Verificador("", sheet)   
-        
         def verificar_informacoes_iniciais():
             verificacao = verificador.checar_campos_planilha()
-       
             if (verificacao["resultado"]):
                 return True
             
@@ -101,32 +100,30 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, op, ARR):
             endereco = rf"{gerenciador.pasta_atual}\Protocolo N° {gerenciador.numero_protocolo} - Tesouraria.docx"
             
             return Relatorio(contratado, liquidacao, valor, data, modelo_termo, gerenciador.numero_protocolo, endereco)
-        
-        def copiar_relatorio(rel):
-            protocolo = rf'Protocolo N° {gerenciador.numero_protocolo} - Tesouraria.docx'
-            if (gerenciador.verificarArquivo(protocolo)):
-                protocolo_existe = True 
-                return 
-            rel.copiar_arquivo(rel.modelo, rf"{gerenciador.pasta_atual}/{protocolo}")
- 
+    
         verificacao = verificar_informacoes_iniciais()
         
         if (verificacao):
+            print(verificacao)
             relatorio = colher_informacao_relatorio()
-            #if (not protocolo_existe): copiar_relatorio(relatorio)
-            ARR.append(colher_informacao_relatorio())
+            param["ARR"].append(relatorio)
         pass         
     
     PLANILHA = load_workbook(sheet_planilha, data_only= True)
     
+    if (OPTION == "1"): gerenciador.entrarEmPasta("WORD")    
     for ordem in (PLANILHA.sheetnames):
-        if (ordem.isdigit() and op == "1"):
+        if (ordem.isdigit() and OPTION == "1"):
             gerar_termos(PLANILHA[ordem], ordem)
-        elif (ordem.isdigit() and op == "2"):
-            gerar_protocolo(PLANILHA[ordem])
+        elif (ordem.isdigit() and OPTION == "2"):
+            buscar_informacoes_protocolo(PLANILHA[ordem])
     
-    if (op == "2"):
-        return ARR
+    if (OPTION == "2"):
+        print(param["ARR"])
+        return param["ARR"]
+    
+    """
+    """
 
 
     """

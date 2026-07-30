@@ -7,15 +7,15 @@ def pegar_endereco_base():
     return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\ANÁLISE MENSAL\2026"
   
 def pegar_planilha_termo(arquivo):
-    return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\INFO\BASE\{arquivo}"
+    return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\INFO\{arquivo}"
     
 def pegar_tipo_termo(prompt):
-    if (prompt == "1"): 
+    if (prompt[0] == "1"):
+        return [{"tipo": "CONTRATO", "arquivo": "ANÁLISE FISCAL.xlsx"}]
+    if (prompt[0] == "2"): 
         return [{"tipo": "ATA", "arquivo": "ANÁLISE FISCAL - ATA.xlsx"}]
-    elif (prompt == "2"):
-        return [{"tipo": "CONTRATO", "arquivo": "ANÁLISE FISCAL2.xlsx"}]
     else: 
-        return [{"tipo": "ATA", "arquivo": "ANÁLISE FISCAL - ATA.xlsx"},  {"tipo": "CONTRATO", "arquivo": "ANÁLISE FISCAL2.xlsx"}] 
+        return [{"tipo": "ATA", "arquivo": "ANÁLISE FISCAL - ATA.xlsx"},  {"tipo": "CONTRATO", "arquivo": "ANÁLISE FISCAL.xlsx"}] 
     
            
 def pegar_numero_protocolo():

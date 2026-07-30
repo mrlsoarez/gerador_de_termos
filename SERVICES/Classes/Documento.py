@@ -31,7 +31,9 @@ class Documento:
         
     def copiar_arquivo(self, antigo, novo):
         shutil.copy(antigo, novo)
-        
+    
+
+    
     def mudar_fonte(texto, name_font):
         texto.font.name = name_font
     
@@ -149,7 +151,10 @@ class Termo(Documento):
         pdf = docx.replace("WORD", "PDF")
         pdf = pdf.replace(".docx", ".pdf")
         print(f"Convertendo termo para PDF.... *.✧*.✧.*.✧*.✧*.✧*.✧.,*.✧*. {self.contratado} - AF {self.af}")
-        convert(docx, pdf)
+        try:
+            convert(docx, pdf)
+        except:
+            pass 
         
 class Relatorio(Documento):
     def __init__(self, contratado, liquidacao, valor, data, modelo, protocolo, endereco):
@@ -161,7 +166,11 @@ class Relatorio(Documento):
         self.protocolo = protocolo
         self.endereco = endereco
     
-    def criar_arquivo(self, doc, termos):
+    def criar_arquivo(self, termos):
+        
+        doc = Document(self.endereco)
+        def formatar_data(self, objeto):
+            return objeto.date().strftime("%d/%m/%Y")
         
         def converter_currency(self, valor):
             locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
@@ -186,10 +195,9 @@ class Relatorio(Documento):
                                     
                 Documento.criar_texto(coluna_um, termos[i].contratado,  px = 8, negrito = True, fonte = "Arial")
                 Documento.criar_texto(coluna_dois, termos[i].liquidacao,  px = 8, negrito = True, fonte = "Arial")
-                Documento.criar_texto(coluna_tres, termos[i].data,  px = 8, negrito = True, fonte = "Arial")
+                Documento.criar_texto(coluna_tres, formatar_data(self, termos[i].data),  px = 8, negrito = True, fonte = "Arial")
                 Documento.criar_texto(coluna_quatro, converter_currency(self, termos[i].valor),  px = 8, negrito = True, fonte = "Arial")
-                                   
-    
+                                
         adicionar_protocolo(self) 
         criar_tabela(self, termos)
         

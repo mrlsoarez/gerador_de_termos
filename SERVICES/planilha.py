@@ -79,36 +79,36 @@ def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(localizacao_planilha, nome_sheet, dado
 
     """
      
-def INICIAR_PLANILHA(localizacao_planilha, gerenciador_arquivos, op, ARR):
+def INICIAR_PLANILHA(localizacao_planilha, gerenciador_arquivos, param):
 
-    if (op == "2"): 
-        planilha = PROCESSAR_ARQUIVO(localizacao_planilha, gerenciador_arquivos, op, ARR)
-        return planilha
+    def ouvir_planilha_incremental():
+        excel = win32com.client.Dispatch("Excel.Application")
+        excel.Visible = True
+        
+        wb = excel.Workbooks.Open(localizacao_planilha)
+        modified = datetime.fromtimestamp(os.path.getmtime(localizacao_planilha))
+        
+        print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\nOUVINDO PLANILHA....\nAperte CTRL + C para encerrar a planilha\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+        
+        try:
+            while True:
+                time.sleep(1)
+                last_modified = os.path.getmtime(localizacao_planilha)
+                last_modified = datetime.fromtimestamp(last_modified)
+                if (last_modified > modified):
+                    PROCESSAR_ARQUIVO(localizacao_planilha, gerenciador_arquivos, param)
+                    modified = datetime.fromtimestamp(os.path.getmtime(localizacao_planilha))     
+        except KeyboardInterrupt:
+            print("Encerrando...\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+        finally:
+            wb.Close(SaveChanges=True)  
+            excel.Quit()               
     
-    excel = win32com.client.Dispatch("Excel.Application")
-    excel.Visible = True
-
-    wb = excel.Workbooks.Open(localizacao_planilha)
-    modified = datetime.fromtimestamp(os.path.getmtime(localizacao_planilha))
-
-    print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\nOUVINDO PLANILHA....\nAperte CTRL + C para encerrar a planilha\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
-    
-    """
-    try:
-        while True:
-            time.sleep(1)
-            last_modified = os.path.getmtime(localizacao_planilha)
-            last_modified = datetime.fromtimestamp(last_modified)
-            if (last_modified > modified):
-                PROCESSAR_ARQUIVO(localizacao_planilha, gerenciador_arquivos, op)
-                modified = datetime.fromtimestamp(os.path.getmtime(localizacao_planilha))     
-    except KeyboardInterrupt:
-        print("Encerrando...\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
-    finally:
-        wb.Close(SaveChanges=True)  
-        excel.Quit()               
-    """
-
+    if ( (param["op"] == "1" and param["modo_total"]) or (param["op"] == "2") ): 
+        return PROCESSAR_ARQUIVO(localizacao_planilha, gerenciador_arquivos, param)
+    else: 
+        ouvir_planilha_incremental()
+   
 """
 
 def ABRIR_PLANILHA(localizacao_planilha):
