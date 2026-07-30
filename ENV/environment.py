@@ -3,7 +3,10 @@
 ROOT = r"C:\Users\Usuario\Documents\MRL"
 TXT_PROTOCOLO = r"C:\Program Files (x86)\numero_protocolo\protocolo.txt"
 
-def pegar_endereco_base():
+def pegar_endereco_base(op = None):
+    if (op == "4"):
+        return rf"{ROOT}\2. DOCS - EQUIPE DE APOIO\PORTARIAS"
+    
     return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\ANÁLISE MENSAL\2026"
   
 def pegar_planilha_termo(arquivo):
@@ -27,16 +30,18 @@ def pegar_numero_protocolo():
         return string 
     
 def atualizar_numero_protocolo():
-            fonte = TXT_PROTOCOLO
-            numero_atualizado = int(pegar_numero_protocolo()) + 1
-            with open(fonte, "r+") as txt:
-                txt.write(str(numero_atualizado))
+    fonte = TXT_PROTOCOLO
+    numero_atualizado = int(pegar_numero_protocolo()) + 1
+    with open(fonte, "r+") as txt:
+        txt.write(str(numero_atualizado))
 
 def pegar_modelos(tipo):
     if (tipo == "termo"):
         return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\MODELOS\MODELO DE TERMO.docx"
     elif (tipo == "protocolo"):
         return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\MODELOS\MODELO DE PROTOCOLO.docx"
+    elif (tipo == "portaria"):
+        return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\MODELOS\MODELO DE PORTARIA.docx"
     
 def pegar_pasta_downloads():
     return r"C:\Users\Usuario\Downloads"

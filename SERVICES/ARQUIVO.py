@@ -4,7 +4,7 @@ from MODULES.GerenciarArquivos import GerenciarArquivos
 from MODULES.EncontrarData import EncontrarData
 
 from ENV.environment import pegar_modelos
-from SERVICES.Classes.Documento import Documento, Termo, Relatorio
+from SERVICES.Classes.Documento import Documento, Termo, Relatorio, Portaria, Fiscal
 from SERVICES.Classes.Verificador import Verificador 
 
 import os
@@ -109,17 +109,86 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, param):
             param["ARR"].append(relatorio)
         pass         
     
+    def gerar_portarias(sheet):
+        
+        def coletar_informacoes_portarias():
+            
+            portaria = None
+            working_sheet = sheet["Portarias"]
+            find_fiscais = False 
+            
+            fornecedores = []
+            fiscais = []
+            
+            objeto = working_sheet["E2"].value
+            cod_tce = working_sheet["F2"].value
+            valor = working_sheet["G2"].value
+            modelo = pegar_modelos("portaria")
+            
+            for i in range(2, working_sheet.max_row):
+                if (working_sheet["A" + str(i)].value == "Portaria"):
+                    find_fiscais = True
+                    portaria = Portaria("XX/26", cod_tce, fornecedores, objeto, valor, modelo, gerenciador.pasta_base)
+                    continue
+                
+                if (find_fiscais):
+                    if (working_sheet["A" + str(i)].value != None):
+                        
+                        principal = working_sheet["B" + str(i)].value
+                        matricula_p = working_sheet["C" + str(i)].value
+                        cargo_p = working_sheet["D" + str(i)].value
+                        secretaria_p = working_sheet["E" + str(i)].value
+                        vinculo_p = working_sheet["F" + str(i)].value
+                        
+                        
+                        suplente = working_sheet["G" + str(i)].value
+                        matricula_s = working_sheet["H" + str(i)].value
+                        cargo_s = working_sheet["I" + str(i)].value
+                        secretaria_s = working_sheet["J" + str(i)].value
+                        vinculo_s = working_sheet["K" + str(i)].value
+                        
+
+                        fiscal_principal = Fiscal(principal, matricula_p, cargo_p, vinculo_p, secretaria_p)
+                        fiscal_suplente = Fiscal(suplente, matricula_s, cargo_s, vinculo_s, secretaria_s)
+                        
+                        portaria.fiscais.append({
+                            "principal": fiscal_principal, 
+                            "suplente": fiscal_suplente
+                        })
+                                        
+                else: 
+                    fornecedores.append({
+                        "fornecedor": working_sheet["B" + str(i)].value,
+                        "cnpj": working_sheet["C" + str(i)].value,
+                        "ata": working_sheet["D" + str(i)].value
+                    })
+
+            return portaria
+                
+        def criar_documento_portaria(portaria):
+            portaria.criar_arquivo()
+            pass 
+        
+        portaria = coletar_informacoes_portarias()
+        criar_documento_portaria(portaria)
+
+    
     PLANILHA = load_workbook(sheet_planilha, data_only= True)
     
-    if (OPTION == "1"): gerenciador.entrarEmPasta("WORD")    
-    for ordem in (PLANILHA.sheetnames):
-        if (ordem.isdigit() and OPTION == "1"):
-            gerar_termos(PLANILHA[ordem], ordem)
-        elif (ordem.isdigit() and OPTION == "2"):
-            buscar_informacoes_protocolo(PLANILHA[ordem])
+    if (OPTION == "1"): gerenciador.entrarEmPasta("WORD") 
+    
+    if (OPTION == "1" or OPTION == "2"):
+        for ordem in (PLANILHA.sheetnames):
+            if (ordem.isdigit() and OPTION == "1"):
+                gerar_termos(PLANILHA[ordem], ordem)
+            elif (ordem.isdigit() and OPTION == "2"):
+                buscar_informacoes_protocolo(PLANILHA[ordem])
+                
+    if (OPTION == "4"):
+        print(OPTION, 'imsoconfused', PLANILHA, sheet_planilha)
+        gerar_portarias(PLANILHA)
     
     if (OPTION == "2"):
-        print(param["ARR"])
         return param["ARR"]
     
     """

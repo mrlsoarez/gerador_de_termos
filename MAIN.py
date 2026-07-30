@@ -173,7 +173,7 @@ def MAIN():
             print("Iniciando a coleta de dados externos.. por favor, aguarde..")
             try:
                 if (option == "1"): dados_contratos = COLETAR_DADOS_EXTERNOS("contratos")
-                dados_servidores =  COLETAR_DADOS_EXTERNOS("servidores")
+                #dados_servidores =  COLETAR_DADOS_EXTERNOS("servidores")
                 #dados_empenhos = COLETAR_DADOS_EXTERNOS("empenhos")
                 #dados_liquidacao =  COLETAR_DADOS_EXTERNOS("liquidacoes")
                 pass
@@ -186,7 +186,7 @@ def MAIN():
             print("Inserindo as informações na planilha de análise base.. favor, aguardar.")     
             try: 
                 if (option == "1"): ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Base", dados_contratos)
-                ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Servidores", dados_servidores)
+                #ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Servidores", dados_servidores)
                 #ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Empenhos", dados_empenhos)
                 #ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Liquidacoes", dados_liquidacao)
             except:
@@ -196,15 +196,15 @@ def MAIN():
         
         print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
         
-        #resposta = realizar_perguntas_iniciais()
+        resposta = realizar_perguntas_iniciais()
             
-        #pergunta_inicial = resposta[0][0]
-        #pergunta_update = resposta[1][0]
-        #pergunta_total = resposta[2][0]
+        pergunta_inicial = resposta[0][0]
+        pergunta_update = resposta[1][0]
+        pergunta_total = resposta[2][0]
             
-        pergunta_inicial = "2"
-        pergunta_update = "s"
-        pergunta_total = "n"
+        #pergunta_inicial = "2"
+        #pergunta_update = "s"
+        #pergunta_total = "n"
                     
         TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)[0]
         PASTA_PLANILHA_ANALISE = pegar_planilha_termo(TIPO_TERMO["arquivo"])
@@ -221,7 +221,7 @@ def MAIN():
         }
         
         print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\nIniciando planilha..")
-        #INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, parametros)
+        INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, parametros)
 
     def iniciar_modulo_protocolo(op):
         
@@ -288,6 +288,16 @@ def MAIN():
         """
         pass 
     
+    def iniciar_modulo_portaria(op):
+        parametros = {
+            "op": op
+        }
+        TIPO_TERMO = pegar_tipo_termo("2")
+        PASTA_PLANILHA_ANALISE = pegar_planilha_termo(TIPO_TERMO[0]["arquivo"])
+        GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(op), "")
+        INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, parametros)
+        pass 
+    
     while True:        
         resposta = CAPTURAR_RESPOSTA("Bem vindo! Escolha dentre as opções \n1. Gerar termos aditivos\n2. Gerar relatório\n3. Atualizar número de protocolo\n4. Gerar portaria\n5. Encerrar\n-> ", ("1", "2", "3", "4", "5"))
         opcao = resposta[0]
@@ -295,6 +305,8 @@ def MAIN():
             iniciar_modulo_termos(opcao)
         elif (opcao == "2"):
             iniciar_modulo_protocolo(opcao)
+        elif (opcao == "4"):
+            iniciar_modulo_portaria(opcao)
         elif (opcao == "5"):
             print("Encerrando.")
             break

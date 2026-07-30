@@ -2,8 +2,10 @@ from MODULES.GerenciarArquivos import GerenciarArquivos
 
 class Verificador:
     def __init__(self, contratado, sheet):
+        
         self.contratado = contratado
         self.sheet = sheet
+        
         self.mapa = {
                 "contratado": "B4",
                 "n_contrato": "E4",
@@ -15,6 +17,18 @@ class Verificador:
                 "tipo_nota": "D16",
                 "numero_af": "A20",
             }
+        """
+        
+        self.mapa.portaria = {
+            "fornecedor": "B",
+            "n_contrato": "C",
+            "objeto": "D",
+            "portaria": "E",
+            "secretaria": "F",
+            "fiscal_principal": "G",
+            "fiscal_suplente": "H",
+        }
+        """
 
     def set_info(self):
         self.contratado = self.sheet[self.mapa['contratado']].value
