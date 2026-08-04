@@ -13,6 +13,7 @@ def pegar_planilha_termo(arquivo):
     return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\INFO\{arquivo}"
     
 def pegar_tipo_termo(prompt):
+    print(prompt)
     if (prompt[0] == "1"):
         return [{"tipo": "CONTRATO", "arquivo": "ANÁLISE FISCAL.xlsx"}]
     if (prompt[0] == "2"): 

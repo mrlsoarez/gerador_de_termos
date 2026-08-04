@@ -50,9 +50,8 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, param):
             def customizar_mensagem(tipo):
                 if (tipo == "Locação"): return "Por este instrumento, em caráter DEFINITIVO, atestamos que a locação acima identificada atende às exigências contratuais."
                 return f"Por este instrumento, em caráter DEFINITIVO, atestamos que os {tipo.lower()} acima identificados atendem às exigências contratuais."
-            
             def definir_gestor(tipo):
-                if (tipo == "contrato"):
+                if (tipo.lower() == "contrato"):
                     return "RONALDO DE SOUZA MARCÍLIO\nGESTOR DE CONTRATOS"   
                 else:
                     return "MURILO SOARES DE OLIVEIRA\nGESTOR DE ATAS"

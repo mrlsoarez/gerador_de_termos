@@ -212,6 +212,7 @@ def MAIN():
             
         criar_pasta_termos(GERENCIADOR_PASTAS)
         
+        print(GERENCIADOR_PASTAS.numero_protocolo)
         if (pergunta_update == "s"): 
             capturar_dados_externos(pergunta_inicial)
 
