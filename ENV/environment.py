@@ -1,16 +1,17 @@
 # Pasta onde ficará armazenado os termos, separados por datas
 
 ROOT = r"C:\Users\Usuario\Documents\MRL"
-TXT_PROTOCOLO = r"C:\Program Files (x86)\numero_protocolo\protocolo.txt"
+TXT_PROTOCOLO = rf"{ROOT}\MODELOS BASE\2. CONTROLE DE PROTOCOLO - RELATÓRIO\protocolo.txt"
 
+# Onde será guardado o documento pronto
 def pegar_endereco_base(op = None):
     if (op == "4"):
-        return rf"{ROOT}\2. DOCS - EQUIPE DE APOIO\PORTARIAS"
+        return rf"{ROOT}\2. DOCS - EQUIPE DE APOIO\2. PORTARIAS"
     
-    return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\ANÁLISE MENSAL\2026"
+    return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\2026"
   
 def pegar_planilha_termo(arquivo):
-    return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\INFO\{arquivo}"
+    return rf"{ROOT}\MODELOS BASE\1. PLANILHAS - ANÁLISE FISCAL - ATA & CONTRATOS\{arquivo}"
     
 def pegar_tipo_termo(prompt):
     print(prompt)
@@ -37,12 +38,13 @@ def atualizar_numero_protocolo():
         txt.write(str(numero_atualizado))
 
 def pegar_modelos(tipo):
+    base_modelos = "MODELOS BASE\3. MODELOS DE DOCUMENTO"
     if (tipo == "termo"):
-        return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\MODELOS\MODELO DE TERMO.docx"
+        return rf"{ROOT}\{base_modelos}\MODELO DE TERMO.docx"
     elif (tipo == "protocolo"):
-        return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\MODELOS\MODELO DE PROTOCOLO.docx"
+        return rf"{ROOT}\{base_modelos}\MODELO DE PROTOCOLO.docx"
     elif (tipo == "portaria"):
-        return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\MODELOS\MODELO DE PORTARIA.docx"
+        return rf"{ROOT}\{base_modelos}\MODELO DE PORTARIA.docx"
     
 def pegar_pasta_downloads():
     return r"C:\Users\Usuario\Downloads"

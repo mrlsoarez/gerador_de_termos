@@ -4,8 +4,13 @@ from MODULES.GerenciarArquivos import GerenciarArquivos
 from MODULES.EncontrarData import EncontrarData
 
 from ENV.environment import pegar_modelos
-from SERVICES.Classes.Documento import Documento, Termo, Relatorio, Portaria, Fiscal
-from SERVICES.Classes.Verificador import Verificador 
+
+from CLASSES.Documento import Documento
+from CLASSES.Termo import Termo 
+from CLASSES.Relatorio import Relatorio
+from CLASSES.Portaria import Portaria, Fiscal
+
+from CLASSES.Verificador import Verificador 
 
 import os
 import shutil
@@ -20,8 +25,6 @@ protocolo_existe = False
 
 modelo_relatorio = pegar_modelos("relatorio")
 
-# she was so happy to look a mess
-# affs
 def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, param):
     
     OPTION = param["op"]

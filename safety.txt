@@ -1,0 +1,5 @@
+# lista de dependencias sao elas
+#win32
+#selenium
+#openpyxl
+#pandas -- xlrd
