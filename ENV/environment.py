@@ -38,7 +38,7 @@ def atualizar_numero_protocolo():
         txt.write(str(numero_atualizado))
 
 def pegar_modelos(tipo):
-    base_modelos = "MODELOS BASE\3. MODELOS DE DOCUMENTO"
+    base_modelos = r"MODELOS BASE\3. MODELOS DE DOCUMENTO"
     if (tipo == "termo"):
         return rf"{ROOT}\{base_modelos}\MODELO DE TERMO.docx"
     elif (tipo == "protocolo"):
