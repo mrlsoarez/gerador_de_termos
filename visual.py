@@ -5,6 +5,9 @@ from tkinter import ttk
 class GeradorTermosGUI:
     def __init__(self, root):
         
+       
+
+     
         # Definindo a janela principal
         self.root = root
         self.root.title("APP")
@@ -67,7 +70,18 @@ class GeradorTermosGUI:
             value="5",
         ).pack(anchor="w")
         
-              
+        ttk.Separator(frame, orient="horizontal").pack(fill="x", pady=10)
+        
+        
+        ttk.Button(
+            frame,
+            text="Gerar"
+        ).pack(pady=20)
+        
+    def confirmar(self):
+        self.pergunta_inicial = self.tipo.get()                  # "1" ou "2"
+        self.pergunta_update = "s" if self.atualizar.get() else "n"
+        self.pergunta_total = "s" if self.geracao_total.get() else "n"
         """
         
      
@@ -89,7 +103,6 @@ class GeradorTermosGUI:
             value="2",
         ).pack(anchor="w")
 
-        ttk.Separator(frame, orient="horizontal").pack(fill="x", pady=10)
 
         # Pergunta 2
         ttk.Checkbutton(
@@ -105,18 +118,8 @@ class GeradorTermosGUI:
             variable=self.geracao_total,
         ).pack(anchor="w")
 
-        ttk.Button(
-            frame,
-            text="Gerar",
-            command=self.confirmar,
-        ).pack(pady=20)
 
-    def confirmar(self):
-        self.pergunta_inicial = self.tipo.get()                  # "1" ou "2"
-        self.pergunta_update = "s" if self.atualizar.get() else "n"
-        self.pergunta_total = "s" if self.geracao_total.get() else "n"
 
-        self.root.destroy()
 
 
         """
