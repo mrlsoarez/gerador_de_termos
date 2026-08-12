@@ -105,6 +105,7 @@ class Portaria(Documento):
             alterar_tabela_atas()
             inserir_data_rodape() 
             
+            print(self.endereco)
             doc.save(rf"{self.endereco}\Portaria N° xx.2026 - Objeto.docx")
             
                

@@ -5,8 +5,8 @@ TXT_PROTOCOLO = rf"{ROOT}\MODELOS BASE\2. CONTROLE DE PROTOCOLO - RELATÓRIO\pro
 
 # Onde será guardado o documento pronto
 def pegar_endereco_base(op = None):
-    if (op == "4"):
-        return rf"{ROOT}\2. DOCS - EQUIPE DE APOIO\2. PORTARIAS"
+    if (op == "3"):
+        return rf"{ROOT}\2. DOCS - EQUIPE DE APOIO\4. PORTARIAS"
     
     return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\2026"
   

@@ -12,17 +12,7 @@ from CLASSES.Portaria import Portaria, Fiscal
 
 from CLASSES.Verificador import Verificador 
 
-import os
-import shutil
-from docx import Document
-from docx2pdf import convert
-
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-from datetime import date
-from docx.shared import Pt
-
 protocolo_existe = False 
-
 modelo_relatorio = pegar_modelos("relatorio")
 
 def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, param):
@@ -115,6 +105,12 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, param):
         
         def coletar_informacoes_portarias():
             
+            def alterar_info_estatutario(dado):
+                if (dado == "ESTATUTÁRIO(INSS)"):
+                    return "Efetivo"
+                else:
+                    return dado 
+
             portaria = None
             working_sheet = sheet["Portarias"]
             find_fiscais = False 
@@ -140,16 +136,17 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, param):
                         matricula_p = working_sheet["C" + str(i)].value
                         cargo_p = working_sheet["D" + str(i)].value
                         secretaria_p = working_sheet["E" + str(i)].value
-                        vinculo_p = working_sheet["F" + str(i)].value
+                        vinculo_p = alterar_info_estatutario(working_sheet["F" + str(i)].value)
                         
                         
                         suplente = working_sheet["G" + str(i)].value
                         matricula_s = working_sheet["H" + str(i)].value
                         cargo_s = working_sheet["I" + str(i)].value
                         secretaria_s = working_sheet["J" + str(i)].value
-                        vinculo_s = working_sheet["K" + str(i)].value
+                        vinculo_s = alterar_info_estatutario(working_sheet["K" + str(i)].value)
                         
-
+                        
+                        
                         fiscal_principal = Fiscal(principal, matricula_p, cargo_p, vinculo_p, secretaria_p)
                         fiscal_suplente = Fiscal(suplente, matricula_s, cargo_s, vinculo_s, secretaria_s)
                         
@@ -172,6 +169,7 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, param):
             pass 
         
         portaria = coletar_informacoes_portarias()
+        print(portaria)
         criar_documento_portaria(portaria)
 
     
@@ -186,8 +184,7 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, param):
             elif (ordem.isdigit() and OPTION == "2"):
                 buscar_informacoes_protocolo(PLANILHA[ordem])
                 
-    if (OPTION == "4"):
-        print(OPTION, 'imsoconfused', PLANILHA, sheet_planilha)
+    if (OPTION == "3"):
         gerar_portarias(PLANILHA)
     
     if (OPTION == "2"):
