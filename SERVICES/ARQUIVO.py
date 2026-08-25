@@ -175,19 +175,19 @@ def PROCESSAR_ARQUIVO(sheet_planilha, gerenciador, param):
     
     PLANILHA = load_workbook(sheet_planilha, data_only= True)
     
-    if (OPTION == "1"): gerenciador.entrarEmPasta("WORD") 
+    if (OPTION == 1): gerenciador.entrarEmPasta("WORD") 
     
-    if (OPTION == "1" or OPTION == "2"):
+    if (OPTION == 1 or OPTION == 2):
         for ordem in (PLANILHA.sheetnames):
-            if (ordem.isdigit() and OPTION == "1"):
+            if (ordem.isdigit() and OPTION == 1):
                 gerar_termos(PLANILHA[ordem], ordem)
-            elif (ordem.isdigit() and OPTION == "2"):
+            elif (ordem.isdigit() and OPTION == 2):
                 buscar_informacoes_protocolo(PLANILHA[ordem])
                 
-    if (OPTION == "3"):
+    if (OPTION == 3):
         gerar_portarias(PLANILHA)
     
-    if (OPTION == "2"):
+    if (OPTION == 2):
         return param["ARR"]
     
     """

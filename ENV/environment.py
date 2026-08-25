@@ -5,19 +5,17 @@ TXT_PROTOCOLO = rf"{ROOT}\MODELOS BASE\2. CONTROLE DE PROTOCOLO - RELATÓRIO\pro
 
 # Onde será guardado o documento pronto
 def pegar_endereco_base(op = None):
-    if (op == "3"):
+    if (op == 3):
         return rf"{ROOT}\2. DOCS - EQUIPE DE APOIO\4. PORTARIAS"
-    
     return rf"{ROOT}\1. ANÁLISE DE PAGAMENTOS\2026"
   
 def pegar_planilha_termo(arquivo):
     return rf"{ROOT}\MODELOS BASE\1. PLANILHAS - ANÁLISE FISCAL - ATA & CONTRATOS\{arquivo}"
     
 def pegar_tipo_termo(prompt):
-    print(prompt)
-    if (prompt[0] == "1"):
+    if (prompt == 1):
         return [{"tipo": "CONTRATO", "arquivo": "ANÁLISE FISCAL.xlsx"}]
-    if (prompt[0] == "2"): 
+    if (prompt == 2): 
         return [{"tipo": "ATA", "arquivo": "ANÁLISE FISCAL - ATA.xlsx"}]
     else: 
         return [{"tipo": "ATA", "arquivo": "ANÁLISE FISCAL - ATA.xlsx"},  {"tipo": "CONTRATO", "arquivo": "ANÁLISE FISCAL.xlsx"}] 

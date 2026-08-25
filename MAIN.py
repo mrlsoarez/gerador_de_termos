@@ -7,6 +7,7 @@ from MODULES.EncontrarData import EncontrarData
 
 # Importação de Bibliotecas
 import os 
+import tkinter as tk
 
 def MAIN():
     
@@ -73,16 +74,10 @@ def MAIN():
                 print("Dados inseridos nas planilhas.")
         
         print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
-        
-        resposta = realizar_perguntas_iniciais()
-            
-        pergunta_inicial = resposta[0][0]
-        pergunta_update = resposta[1][0]
-        pergunta_total = resposta[2][0]
-            
-        #pergunta_inicial = "2"
-        #pergunta_update = "s"
-        #pergunta_total = "n"
+
+        pergunta_inicial = op["dados_extras"]["tipo_termo"]
+        pergunta_update = op["dados_extras"]["atualizar_dados"]
+        pergunta_total = op["dados_extras"]["analise_imediata"]
                     
         TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)[0]
         PASTA_PLANILHA_ANALISE = pegar_planilha_termo(TIPO_TERMO["arquivo"])
@@ -95,13 +90,13 @@ def MAIN():
             capturar_dados_externos(pergunta_inicial)
 
         parametros = {
-            "op": op, 
+            "op": op["opcao"], 
             "modo_total": True if pergunta_total == "s" else False
         }
         
         print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\nIniciando planilha..")
         INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, parametros)
-
+    
     def iniciar_modulo_protocolo(op):
         
         print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
@@ -116,13 +111,13 @@ def MAIN():
             
             return  GERENCIADOR_PASTAS.entrarEmPasta(fr"{PASTA_MES}\{PASTA_DIA}\REMESSA X - PROTOCOLO N° {GERENCIADOR_PASTAS.numero_protocolo}\PROTOCOLOS")
             
-        def gerar_protocolo(pergunta_inicial):
+        def gerar_protocolo():
  
             ARRAY = []
-            TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)
+            TIPO_TERMO = pegar_tipo_termo(op["dados_extras"]["tipo_relatorio"])
             
             parametros = {
-                "op": op, 
+                "op": op["opcao"], 
                 "ARR": ARRAY
             }
             
@@ -131,7 +126,6 @@ def MAIN():
                 GERENCIADOR_PASTAS.set_tipo_arquivo = TIPO_TERMO[i]["tipo"]
                 ARRAY = INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, parametros)
             
-            print(ARRAY)
             protocolo = ARRAY[0]
             
             protocolo.copiar_arquivo(protocolo.modelo, protocolo.endereco)
@@ -141,41 +135,43 @@ def MAIN():
         
         if (not entrar_na_pasta_de_protocolo()):
             print("Pasta de relatório ainda não existe!")
-            return 
+            return
         
-        pergunta_inicial = CAPTURAR_RESPOSTA(
-            "Deseja gerar relatórios de quais informações?: \n1. Contrato\n2. Ata\n3. Ambos\n-> ", ("1", "2", "3")
-        )
+        gerar_protocolo()
         
-        gerar_protocolo(pergunta_inicial)
-        
-        
-      
-        
-    
-         
-    
-        """
-        
-        if (pergunta_inicial[0] == "3"):
-            for i in range(1, 3):
-                TIPO_TERMO = pegar_tipo_termo(str(i))
-        
-        
-        TIPO_TERMO = pegar_tipo_termo(pergunta_inicial)
-        GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), pergunta_inicial)
-        """
+
         pass 
     
     def iniciar_modulo_portaria(op):
         parametros = {
-            "op": op
+            "op": op["opcao"]
         }
-        TIPO_TERMO = pegar_tipo_termo("2")
+        TIPO_TERMO = pegar_tipo_termo(2)
         PASTA_PLANILHA_ANALISE = pegar_planilha_termo(TIPO_TERMO[0]["arquivo"])
         GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(op), "")
         INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, parametros)
         pass 
+    
+    
+    iniciador = VISUAL()
+    opcao = iniciador["opcao"]
+    
+    while True: 
+        if (opcao == 1):
+            iniciar_modulo_termos(iniciador)
+        elif (opcao == 2):
+            iniciar_modulo_protocolo(iniciador)
+        elif (opcao == 3):
+            iniciar_modulo_portaria(iniciador)
+        elif (opcao == 4):
+            atualizar_numero_protocolo()
+        elif (opcao == 5):
+            print("Encerrando.")
+            break
+    
+        iniciador = VISUAL()
+        opcao = iniciador["opcao"]
+    """
     
     while True:        
         resposta = CAPTURAR_RESPOSTA("Bem vindo! Escolha dentre as opções \n1. Gerar termos aditivos\n2. Gerar relatório\n3. Gerar portaria\n4. Atualizar número de protocolo\n5. Encerrar\n-> ", ("1", "2", "3", "4", "5"))
@@ -191,6 +187,7 @@ def MAIN():
         elif (opcao == "5"):
             print("Encerrando.")
             break
+    """
     
 def CAPTURAR_RESPOSTA(mensagem, dado_esperado):
 
@@ -202,4 +199,62 @@ def CAPTURAR_RESPOSTA(mensagem, dado_esperado):
         
     return (PERGUNTA, True)
 
+def VISUAL():
+    
+    dados_retorno = {
+        "opcao": "",
+        "dados_extras": ""
+    }
+    
+    def criar_botoes_de_opcao(root, botoes, op):
+        for i in range(len(botoes)):
+            tk.Radiobutton(root, text = botoes[i], variable=op, value = i + 1).pack(anchor = tk.W)
+      
+    def gerar_janela(elementos):
+        
+        ROOT = tk.Tk()
+        OPCOES = []
+
+        for i in range(len(elementos)):
+            op = tk.IntVar()
+            print(elementos[i][0], elementos[i][1])
+            tk.Label(ROOT, text = elementos[i][0]).pack() 
+            criar_botoes_de_opcao(ROOT, elementos[i][1], op)
+            OPCOES.append(op)    
+
+        button = tk.Button(ROOT, text = "Enviar", width = 25, command=ROOT.destroy).pack()
+        ROOT.mainloop()
+        
+        return OPCOES
+    
+    opcao_inicial = gerar_janela([["Bem vindo", ("1. Gerar termos aditivos", "2. Gerar Relatório", "3. Gerar Portaria", "4. Atualizar Número de Protocolos", "5. Encerrar")]])
+    dados_retorno["opcao"] = opcao_inicial[0].get()
+
+    if (dados_retorno["opcao"] == 1):
+        
+        opcoes = gerar_janela([
+                                ["Bem vindo ao gerador de termos!!\nEscolha dentre as opções o tipo de termo que deseja gerar:", ("Contrato", "Ata")],
+                                ["Deseja atualizar os dados da planilha?", ("Sim", "Não")],
+                                ["Deseja analisar a planilha e gerar os documentos imediatamente?", ("Sim", "Não")]
+                            ])
+        
+        dados_retorno["dados_extras"] = {
+            "tipo_termo": opcoes[0].get(),
+            "atualizar_dados":"n" if opcoes[1].get() == 2 else "s",
+            "analise_imediata": "n" if opcoes[2].get() == 2 else "s"
+        }
+    
+    if (dados_retorno["opcao"] == 2):
+        
+        opcoes = gerar_janela([
+                                ["Bem vindo ao gerador de relatório!!\nDeseja gerar relatório para qual tipo de termo?", ("Contrato", "Ata", "Ambos")],
+        
+                            ])
+                
+        dados_retorno["dados_extras"] = {
+            "tipo_relatorio": opcoes[0].get()
+        }
+            
+    return dados_retorno
+    
 MAIN()

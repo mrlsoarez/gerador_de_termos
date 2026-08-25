@@ -104,7 +104,9 @@ def INICIAR_PLANILHA(localizacao_planilha, gerenciador_arquivos, param):
             wb.Close(SaveChanges=True)  
             excel.Quit()               
 
-    if ( (param["op"] == "1" and param["modo_total"]) or (param["op"] == "2") or param["op"] == "3"): 
+    
+    if ( (param["op"] == 1 and param["modo_total"]) or (param["op"] == 2) or param["op"] == 3): 
+        print(param["op"], "a")
         return PROCESSAR_ARQUIVO(localizacao_planilha, gerenciador_arquivos, param)
     else: 
         ouvir_planilha_incremental()
