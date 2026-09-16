@@ -8,6 +8,7 @@ from MODULES.EncontrarData import EncontrarData
 # Importação de Bibliotecas
 import os 
 import tkinter as tk
+from tkinter import ttk
 
 def MAIN():
     
@@ -207,56 +208,220 @@ def VISUAL():
         "opcao": "",
         "dados_extras": ""
     }
-    
+
+    # ============================================================
+    # CONFIGURAÇÕES VISUAIS
+    # ============================================================
+
+    LARGURA = 850
+    ALTURA = 600
+
+    FONTE_TITULO = ("Segoe UI", 20, "bold")
+    FONTE_PROTOCOLO = ("Segoe UI", 11, "bold")
+    FONTE_LABEL = ("Segoe UI", 12, "bold")
+    FONTE_OPCAO = ("Segoe UI", 11)
+    FONTE_BOTAO = ("Segoe UI", 11, "bold")
+    FONTE_RODAPE = ("Segoe UI", 9)
+
+    # ============================================================
+    # FUNÇÕES
+    # ============================================================
+
     def criar_botoes_de_opcao(root, botoes, op):
-        for i in range(len(botoes)):
-            tk.Radiobutton(root, text = botoes[i], variable=op, value = i + 1).pack(anchor = tk.W)
-      
+
+        frame = tk.Frame(root)
+        frame.pack(fill="x", padx=30, pady=(5, 15))
+
+        for i, texto in enumerate(botoes):
+
+            rb = tk.Radiobutton(
+                frame,
+                text=texto,
+                variable=op,
+                value=i + 1,
+                font=FONTE_OPCAO,
+                anchor="w",
+                padx=10,
+                pady=7,
+                cursor="hand2"
+            )
+
+            rb.pack(fill="x")
+
+
     def gerar_janela(elementos):
-        
+
         ROOT = tk.Tk()
+
+        ROOT.title("Gerador de Termos")
+        ROOT.geometry(f"{LARGURA}x{ALTURA}")
+        ROOT.resizable(False, False)
+
+        # --------------------------------------------------------
+        # HEADER
+        # --------------------------------------------------------
+
+        header = tk.Frame(ROOT)
+        header.pack(fill="x", padx=35, pady=(25, 10))
+
+        titulo = tk.Label(
+            header,
+            text="GERADOR DE TERMOS",
+            font=FONTE_TITULO
+        )
+        titulo.pack(side="left")
+
+        protocolo = tk.Label(
+            header,
+            text="N° PROTOCOLO: ____",
+            font=FONTE_PROTOCOLO
+        )
+        protocolo.pack(side="right")
+
+        # Linha separadora
+        ttk.Separator(
+            ROOT,
+            orient="horizontal"
+        ).pack(fill="x", padx=35, pady=(5, 25))
+
+        # --------------------------------------------------------
+        # ÁREA PRINCIPAL
+        # --------------------------------------------------------
+
+        conteudo = tk.Frame(ROOT)
+        conteudo.pack(fill="both", expand=True, padx=35)
+
         OPCOES = []
 
         for i in range(len(elementos)):
-            op = tk.IntVar()
-            print(elementos[i][0], elementos[i][1])
-            tk.Label(ROOT, text = elementos[i][0]).pack() 
-            criar_botoes_de_opcao(ROOT, elementos[i][1], op)
-            OPCOES.append(op)    
 
-        button = tk.Button(ROOT, text = "Enviar", width = 25, command=ROOT.destroy).pack()
+            titulo_opcao = tk.Label(
+                conteudo,
+                text=elementos[i][0],
+                font=FONTE_LABEL,
+                justify="left",
+                anchor="w"
+            )
+
+            titulo_opcao.pack(
+                fill="x",
+                pady=(5, 0)
+            )
+
+            op = tk.IntVar(value=0)
+
+            criar_botoes_de_opcao(
+                conteudo,
+                elementos[i][1],
+                op
+            )
+
+            OPCOES.append(op)
+
+            # Separador entre grupos
+            if i < len(elementos) - 1:
+                ttk.Separator(
+                    conteudo,
+                    orient="horizontal"
+                ).pack(fill="x", pady=5)
+
+        # --------------------------------------------------------
+        # BOTÃO
+        # --------------------------------------------------------
+
+        area_botao = tk.Frame(ROOT)
+        area_botao.pack(fill="x", padx=35, pady=(10, 15))
+
+        enviar = tk.Button(
+            area_botao,
+            text="Enviar",
+            width=20,
+            height=2,
+            font=FONTE_BOTAO,
+            cursor="hand2",
+            command=ROOT.destroy
+        )
+
+        enviar.pack()
+
+        # --------------------------------------------------------
+        # FOOTER
+        # --------------------------------------------------------
+
+        footer = tk.Label(
+            ROOT,
+            text="made by mrl.",
+            font=FONTE_RODAPE
+        )
+
+        footer.pack(pady=(0, 12))
+
         ROOT.mainloop()
-        
+
         return OPCOES
-    
-    opcao_inicial = gerar_janela([["Bem vindo", ("1. Gerar termos aditivos", "2. Gerar Relatório", "3. Gerar Portaria", "4. Atualizar Número de Protocolos", "5. Encerrar")]])
+
+    # ============================================================
+    # MENU INICIAL
+    # ============================================================
+
+    opcao_inicial = gerar_janela([
+        [
+            "Bem-vindo! Selecione uma opção:",
+            (
+                "1. Gerar termos aditivos",
+                "2. Gerar Relatório",
+                "3. Gerar Portaria",
+                "4. Atualizar Número de Protocolos",
+                "5. Encerrar"
+            )
+        ]
+    ])
+
     dados_retorno["opcao"] = opcao_inicial[0].get()
 
-    if (dados_retorno["opcao"] == 1):
-        
+    # ============================================================
+    # TERMOS
+    # ============================================================
+
+    if dados_retorno["opcao"] == 1:
+
         opcoes = gerar_janela([
-                                ["Bem vindo ao gerador de termos!!\nEscolha dentre as opções o tipo de termo que deseja gerar:", ("Contrato", "Ata")],
-                                ["Deseja atualizar os dados da planilha?", ("Sim", "Não")],
-                                ["Deseja analisar a planilha e gerar os documentos imediatamente?", ("Sim", "Não")]
-                            ])
-        
+            [
+                "Bem-vindo ao Gerador de Termos!\n"
+                "Escolha o tipo de termo que deseja gerar:",
+                ("Contrato", "Ata")
+            ],
+
+            [
+                "Deseja analisar a planilha e gerar os documentos imediatamente?",
+                ("Sim", "Não")
+            ]
+        ])
+
         dados_retorno["dados_extras"] = {
             "tipo_termo": opcoes[0].get(),
-            "atualizar_dados":"n" if opcoes[1].get() == 2 else "s",
+            "atualizar_dados": "n" if opcoes[1].get() == 2 else "s",
             "analise_imediata": "n" if opcoes[2].get() == 2 else "s"
         }
-    
-    if (dados_retorno["opcao"] == 2):
-        
+
+    # ============================================================
+    # RELATÓRIO
+    # ============================================================
+
+    if dados_retorno["opcao"] == 2:
+
         opcoes = gerar_janela([
-                                ["Bem vindo ao gerador de relatório!!\nDeseja gerar relatório para qual tipo de termo?", ("Contrato", "Ata", "Ambos")],
-        
-                            ])
-                
+            [
+                "Bem-vindo ao Gerador de Relatórios!\n"
+                "Deseja gerar relatório para qual tipo de termo?",
+                ("Contrato", "Ata", "Ambos")
+            ]
+        ])
+
         dados_retorno["dados_extras"] = {
             "tipo_relatorio": opcoes[0].get()
         }
-            
+
     return dados_retorno
     
 MAIN()
