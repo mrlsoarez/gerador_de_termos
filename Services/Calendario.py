@@ -1,6 +1,9 @@
 from datetime import date
 
-def EncontrarData(parametro, *args):
+# Modo de uso: 
+    # Definir se quer encontrar dia, mês ou ano. Se quiser mês, definir se é extenso
+    
+def EncontrarData(parametro,  *args):
     
     calendario = {
         "01": "JANEIRO",
@@ -38,4 +41,3 @@ def EncontrarData(parametro, *args):
         return PegarMes(data, args[0])
     elif (parametro == "ano"):
         return PegarAno(data)
-    
