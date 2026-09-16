@@ -41,7 +41,6 @@ class Relatorio(Documento):
                 coluna_dois = nova_linha.cells[1].paragraphs[0]
                 coluna_tres = nova_linha.cells[2].paragraphs[0]
                 coluna_quatro = nova_linha.cells[3].paragraphs[0]
-                                    
                 Documento.criar_texto(coluna_um, termos[i].contratado,  px = 8, negrito = True, fonte = "Arial")
                 Documento.criar_texto(coluna_dois, termos[i].liquidacao,  px = 8, negrito = True, fonte = "Arial")
                 Documento.criar_texto(coluna_tres, formatar_data(self, termos[i].data),  px = 8, negrito = True, fonte = "Arial")

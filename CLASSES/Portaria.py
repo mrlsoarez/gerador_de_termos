@@ -28,35 +28,33 @@ class Portaria(Documento):
                 Documento.criar_texto(tce, texto, negrito = True, posicionamento="Centro", fonte = "Arial")
         
             def criar_tabela_fiscais():
-                    
-                    def capitalizar(texto):
-                        excecoes = {"de", "e"}
+                def capitalizar(texto):
+                    excecoes = {"de", "e"}
 
-                        return " ".join(
-                            palavra if palavra.lower() in excecoes
-                            else palavra.capitalize()
-                            for palavra in texto.lower().split()
-                        )
+                    return " ".join(
+                        palavra if palavra.lower() in excecoes
+                        else palavra.capitalize()
+                        for palavra in texto.lower().split()
+                    )
                         
-                    def criar_nova_linha(dados):
-                        nova_linha = tabela.add_row()
+                def criar_nova_linha(dados):
+                    nova_linha = tabela.add_row()
                         
-                        coluna_um = nova_linha.cells[0].paragraphs[0]
-                        coluna_dois = nova_linha.cells[1].paragraphs[0]
-                        coluna_tres = nova_linha.cells[2].paragraphs[0]
-                        coluna_quatro = nova_linha.cells[3].paragraphs[0]
+                    coluna_um = nova_linha.cells[0].paragraphs[0]
+                    coluna_dois = nova_linha.cells[1].paragraphs[0]
+                    coluna_tres = nova_linha.cells[2].paragraphs[0]
+                    coluna_quatro = nova_linha.cells[3].paragraphs[0]
                                                 
-                        Documento.criar_texto(coluna_um, dados[0],  px = 11, fonte = "Arial")
-                        Documento.criar_texto(coluna_dois, dados[1],  px = 11,  fonte = "Arial")
-                        Documento.criar_texto(coluna_tres, dados[2],  px = 11,  fonte = "Arial")
-                        Documento.criar_texto(coluna_quatro, dados[3],  px = 11, fonte = "Arial")
+                    Documento.criar_texto(coluna_um, dados[0],  px = 11, fonte = "Arial")
+                    Documento.criar_texto(coluna_dois, dados[1],  px = 11,  fonte = "Arial")
+                    Documento.criar_texto(coluna_tres, dados[2],  px = 11,  fonte = "Arial")
+                    Documento.criar_texto(coluna_quatro, dados[3],  px = 11, fonte = "Arial")
                         
                     fiscais = self.fiscais  
                                        
                     tabela = doc.tables[0]   
                     
-                    for index in range(len(fiscais)):
-                        
+                    for index in range(len(fiscais)):   
                         criar_nova_linha(["", "FISCAL", "SUPLENTE", "GESTOR"])
                         criar_nova_linha(["NOME DO SERVIDOR", capitalizar(fiscais[index]["principal"].nome), capitalizar(fiscais[index]["suplente"].nome), "Murilo Soares de Oliveira"])
                         criar_nova_linha(["CARGO", capitalizar(fiscais[index]["principal"].cargo), capitalizar(fiscais[index]["suplente"].cargo), "Assistente de Administração"])
@@ -66,7 +64,7 @@ class Portaria(Documento):
 
                         if (index != len(fiscais) - 1): 
                             nova_linha = tabela.add_row()
-            
+
             def alterar_tabela_atas():
                 
                 tabela = doc.tables[1] 
@@ -105,7 +103,6 @@ class Portaria(Documento):
             alterar_tabela_atas()
             inserir_data_rodape() 
             
-            print(self.endereco)
             doc.save(rf"{self.endereco}\Portaria N° xx.2026 - Objeto.docx")
             
                

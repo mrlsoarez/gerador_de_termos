@@ -107,6 +107,24 @@ def COLETAR_DADOS_EXTERNOS(tipo):
                     "Fonte": "FONTE_STN",
                 }
             }
+        
+    def get_licitacoes():
+        return  { "url": rf"{URL}/transparencia/VersaoJson/LicitacoesEContratos/",
+                "json": {
+                        "ConectarExercicio": "2026",
+                        "Listagem": "Licitacoes",
+                        "Ano": "2026",
+                        "Empresa": "1",
+                        "MostraDadosConsolidado": "True",
+                    },   
+                    "dados_para_planilha": {
+                        "Ano": "ANO",
+                        "Processo": "PROCLIC", 
+                        "Modalidade": "LICIT",
+                        "Número Modalidade": "LICITACAO",
+                        "Objeto": "DISCR",
+                    }
+                }
     
     """
     
@@ -149,16 +167,17 @@ def COLETAR_DADOS_EXTERNOS(tipo):
         return COLETAR_DADOS_EXTERNOS_JSON(get_empenhos())
     elif (tipo == "servidores"):
         return COLETAR_DADOS_EXTERNOS_JSON(get_servidores())
+    elif (tipo == "licitacao"):
+        return COLETAR_DADOS_EXTERNOS_JSON(get_licitacoes())
    
 
 # Ambos retornam JSON, o primeiro extrai dados da API do transparência, o segundo extrai os dados de uma planilha
 def COLETAR_DADOS_EXTERNOS_JSON(param):
-    
+
     session = requests.Session()
     
     def buscar_dados(url, json, dados_planilha):
         response = session.get(url, params=json)
-        print(response)
         dados_extraidos = response.json()
         #A função abaixo possui a função de relacionar os dados com as células da planilha
         dados_tratados = realizar_tratativa_nos_dados(url, dados_planilha, dados_extraidos)
@@ -174,10 +193,10 @@ def COLETAR_DADOS_EXTERNOS_JSON(param):
                 dict['Contrato'] = parse   
         for index in range(len(dados_extraidos)):
             dict = {}
-            for chave in dados_planilha:       
+            for chave in dados_planilha:    
                 INFO = dados_extraidos[index][dados_planilha[chave]]
                 dict[chave] = INFO
-            if ("contratos" in url.lower()):
+            if ("contratos" in url.lower() and ("licitacao")):
                 formatar_numero_contrato(dict)    
             dados_tratados.append(dict)
         return dados_tratados

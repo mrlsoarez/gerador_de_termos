@@ -26,7 +26,6 @@ def CONVERTER_PARA_XLSX(arquivo):
 def ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(localizacao_planilha, nome_sheet, dados):
 
     ANALISE_FISCAL = load_workbook(localizacao_planilha)
-    
     def limpar_planilha(sheet):
         if sheet.max_row > 0:
             sheet.delete_rows(1, sheet.max_row)

@@ -51,7 +51,9 @@ def MAIN():
         def capturar_dados_externos(option):
             print("Iniciando a coleta de dados externos.. por favor, aguarde..")
             try:
-                if (option == "1"): dados_contratos = COLETAR_DADOS_EXTERNOS("contratos")
+                if (option == 1): 
+                    dados_contratos = COLETAR_DADOS_EXTERNOS("contratos")
+                dados_licit = COLETAR_DADOS_EXTERNOS("licitacao")
                 #dados_servidores =  COLETAR_DADOS_EXTERNOS("servidores")
                 #dados_empenhos = COLETAR_DADOS_EXTERNOS("empenhos")
                 #dados_liquidacao =  COLETAR_DADOS_EXTERNOS("liquidacoes")
@@ -64,7 +66,9 @@ def MAIN():
             print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
             print("Inserindo as informações na planilha de análise base.. favor, aguardar.")     
             try: 
-                if (option == "1"): ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Base", dados_contratos)
+                if (option == 1):
+                    ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Base", dados_contratos)
+                ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Licit", dados_licit)
                 #ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Servidores", dados_servidores)
                 #ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Empenhos", dados_empenhos)
                 #ATUALIZAR_PLANILHA_COM_DADOS_EXTERNOS(PASTA_PLANILHA_ANALISE, "Liquidacoes", dados_liquidacao)
@@ -84,8 +88,7 @@ def MAIN():
         GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(), TIPO_TERMO["tipo"])
             
         criar_pasta_termos(GERENCIADOR_PASTAS)
-        
-        print(GERENCIADOR_PASTAS.numero_protocolo)
+        print(pergunta_update, pergunta_inicial, type(pergunta_inicial))
         if (pergunta_update == "s"): 
             capturar_dados_externos(pergunta_inicial)
 
@@ -151,7 +154,6 @@ def MAIN():
         GERENCIADOR_PASTAS = GerenciarArquivos(pegar_endereco_base(op), "")
         INICIAR_PLANILHA(PASTA_PLANILHA_ANALISE, GERENCIADOR_PASTAS, parametros)
         pass 
-    
     
     iniciador = VISUAL()
     opcao = iniciador["opcao"]
