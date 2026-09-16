@@ -1,3 +1,4 @@
+
 import tkinter as tk
 from tkinter import ttk
 
@@ -16,11 +17,14 @@ def MAIN():
     def GERAR_TERMO(dados, op):
 
         INICIALIZADOR.setModelo(op)
-
-        for dado in dados:
-            termo = Termo(dado, INICIALIZADOR.modelo, INICIALIZADOR.pasta_atual)
-            print(termo)
-        pass 
+        
+        for chave in dados: 
+            for index in range(len(dados[chave])): 
+                termo = Termo(dados[chave][index], INICIALIZADOR.modelo, INICIALIZADOR.pasta_atual)
+                termo.setOrdem(index+1)                
+                termo.setEndereco(rf"{INICIALIZADOR.pasta_atual}\{dados[chave][index].tipo}")            
+                if not termo.verificarSeExiste():
+                    termo.criarArquivo()
 
     def GERAR_RELATORIO(dados, op):
         INICIALIZADOR.setModelo(op)

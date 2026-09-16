@@ -79,5 +79,12 @@ class Arquivo:
             Arquivo.criar_texto(paragrafo, dado["conteudo"], dado["negrito"], fonte, px = 10)
 
         return tabela
-    
-
+    @staticmethod
+    def salvarPDF(endereco):
+        docx = endereco
+        pdf = docx.replace(".docx", ".pdf")
+        print(docx, pdf)
+        try:
+            convert(docx, pdf)
+        except:
+            pass 

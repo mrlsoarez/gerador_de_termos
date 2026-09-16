@@ -67,7 +67,7 @@ class Env:
             2: self.pasta_modelo + r"\MODELO DE RELATÓRIO.docx"
         }
         self.modelo = dict[op]
-
+    
 def inicializarAmbiente():
     controladorAmbiente = Env()
     controladorAmbiente.criarPastasIniciais()

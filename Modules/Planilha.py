@@ -19,7 +19,7 @@ def analisarPlanilha(inicializador):
 
         return verificacao 
     
-    ARRAY = []
+    DADOS = {"contrato": [], "ata": []}
 
     planilha = inicializador.planilha
     mapa = Documento.mapa 
@@ -32,17 +32,20 @@ def analisarPlanilha(inicializador):
         else: 
             if (seNaoExistemCamposVazios(mapa, planilha, sheet)):
                 doc = Documento(
+                    ordem = sheet,
                     contratado = planilha[sheet][mapa["contratado"]].value,
                     contrato = planilha[sheet][mapa["n_contrato"]].value,
                     objeto = planilha[sheet][mapa["objeto"]].value,
                     af = planilha[sheet][mapa["numero_af"]].value,
-                    mensagem = planilha[sheet][mapa["tipo_nota"]].value,
-                    gestor = planilha[sheet][mapa["tipo"]].value,
+                    tipo_nota = planilha[sheet][mapa["tipo_nota"]].value,
                     liq = planilha[sheet][mapa["numero_liquidacao"]].value,
                     data = planilha[sheet][mapa["data_liquidacao"]].value,
                     valor = planilha[sheet][mapa["valor_bruto_liquidacao"]].value,
                     tipo = planilha[sheet][mapa["tipo"]].value
                 )
-                ARRAY.append(doc)
+                
+                
+                DADOS[doc.tipo.lower()].append(doc)
 
-    return ARRAY
+    return DADOS
+

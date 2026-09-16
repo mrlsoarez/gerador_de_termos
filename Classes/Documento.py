@@ -1,4 +1,6 @@
 from docx import Document 
+from docx2pdf import convert 
+import os 
 
 from Classes.Arquivo import Arquivo
 
@@ -17,14 +19,14 @@ class Documento():
         "tipo": "B5"
     }
 
-    def __init__(self, contratado, contrato, objeto, af, mensagem, gestor, liq, data, valor, tipo):
+    def __init__(self, ordem, contratado, contrato, objeto, af, tipo_nota, liq, data, valor, tipo):
         # Info Termo
+        self.ordem = ordem 
         self.contratado = contratado
         self.contrato = contrato 
         self.objeto = objeto 
         self.af = af
-        self.mensagem = mensagem
-        self.gestor = gestor
+        self.tipo_nota = tipo_nota
 
         # Info Relatorio
         self.liq = liq 
@@ -33,50 +35,95 @@ class Documento():
 
         self.tipo = tipo
 
-class Termo(): 
+  
+
+        
+class Termo(Documento): 
 
     def __init__(self, termo, modelo, endereco):
+        self.termo = termo 
+        self.modelo = modelo 
+        self.endereco = endereco 
         pass 
+    
+    def setEndereco(self, endereco): 
+        self.endereco = endereco
+    
+    def setQuantidadeTermos(self, quant):
+        self.quantidade = quant + 1
 
-    def criar_arquivo(self):
+    def verificarSeExiste(self): 
+        info = self.termo     
+        nome_arquivo = rf"{self.ordem}. {info.contratado} - AF {info.af[:4]}.docx"
+        self.setEndereco(rf"{self.endereco}\{nome_arquivo}")
+        return os.path.exists(self.endereco)
+        
+    def setOrdem(self, ordem):
+        self.ordem = ordem
+                
+    def setGestor(self): 
+        if (self.termo.tipo.lower() == "contrato"):
+            self.gestor = "RONALDO DE SOUZA MARCÍLIO\nGESTOR DE CONTRATOS"   
+        else:
+            self.gestor = "MURILO SOARES DE OLIVEIRA\nGESTOR DE ATAS"
+        pass 
+    
+    def setMensagem(self):
+        if (self.termo.tipo.lower() == "locação"): 
+            self.mensagem = f"Por este instrumento, em caráter DEFINITIVO, atestamos que a locação acima identificada atende às exigências contratuais."
+            return   
+        self.mensagem = f"Por este instrumento, em caráter DEFINITIVO, atestamos que os {self.termo.tipo_nota.lower()} acima identificados atendem às exigências contratuais."
+        pass
+
+    def criarArquivo(self):
         
         doc = Document(self.modelo)
+        info = self.termo 
         
         def definir_tabela(self):
 
-            if self.tipo.lower() == "ata":
+            if info.tipo.lower() == "ata":
                 campo = "ATA N°"
             else:
                 campo = "CONTRATO N°" 
 
             dados = [{"celula": (1, 0), "conteudo": campo, "negrito": True}, 
-                     {"celula": (1, 1), "conteudo": self.contrato, "negrito": False }, 
-                     {"celula": (2, 1), "conteudo": self.contratado, "negrito": False }, 
-                     {"celula": (3, 1), "conteudo": self.objeto, "negrito": False }, 
-                     {"celula": (4, 1), "conteudo": self.af, "negrito": False}, 
+                     {"celula": (1, 1), "conteudo": info.contrato, "negrito": False }, 
+                     {"celula": (2, 1), "conteudo": info.contratado, "negrito": False }, 
+                     {"celula": (3, 1), "conteudo": info.objeto, "negrito": False }, 
+                     {"celula": (4, 1), "conteudo": info.af, "negrito": False}, 
                      {"celula": (6, 1), "conteudo": self.mensagem, "negrito": False }, 
                     ]
             
-            doc.tables[0] = Documento.modificar_tabela(doc.tables[0], dados)
+            doc.tables[0] = Arquivo.modificar_tabela(doc.tables[0], dados)
             
         def definir_data(self):
-            data_texto = "BATAGUASSU/MS, " + Documento.encontrar_data_de_hoje_em_extenso()
-            Documento.criar_texto(doc.add_paragraph(), data_texto, negrito = True, posicionamento = "Direita")
+            data_texto = "BATAGUASSU/MS, " + Arquivo.encontrar_data_de_hoje_em_extenso()
+            Arquivo.criar_texto(doc.add_paragraph(), data_texto, negrito = True, posicionamento = "Direita")
         
         def adicionar_espaco(self, quant):
             for i in range(quant):
                 doc.add_paragraph("")
         
         def definir_gestor(self):
-            Documento.adicionar_linha_de_assinatura(doc.add_paragraph(), self.gestor)
-            
-                
+            Arquivo.adicionar_linha_de_assinatura(doc.add_paragraph(), self.gestor)
+        
+        self.setGestor()
+        self.setMensagem() 
+           
         definir_tabela(self)
         definir_data(self)
         adicionar_espaco(self, 3)
         definir_gestor(self)
         
-        doc.save(self.endereco)
+        try: 
+            doc.save(self.endereco)
+        except:
+            pass 
+        else: 
+            print(rf"Documento salvo: {self.endereco}, convertendo para PDF...")
+        
+        Arquivo.salvarPDF(self.endereco)
 
 class Relatorio():
 
