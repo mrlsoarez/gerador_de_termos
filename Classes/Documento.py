@@ -1,20 +1,42 @@
-from CLASSES.Documento import Documento
-from docx import Document
-from docx2pdf import convert
+from docx import Document 
 
-class Termo(Documento):
-    
-    def __init__(self, contratado, endereco, ordem, contrato, objeto, af, mensagem, gestor, tipo, modelo):
-        super().__init__(contratado)
-        self.ordem = ordem
-        self.endereco = endereco
+from Classes.Arquivo import Arquivo
+
+class Documento():
+
+    mapa = {
+        "contratado": "B4",
+        "n_contrato": "E4",
+        "objeto": "F4",
+        "numero_empenho": "A8",
+        "numero_liquidacao": "A12",
+        "data_liquidacao": "B12",
+        "valor_bruto_liquidacao": "C12",
+        "tipo_nota": "D16",
+        "numero_af": "A20",
+        "tipo": "B5"
+    }
+
+    def __init__(self, contratado, contrato, objeto, af, mensagem, gestor, liq, data, valor, tipo):
+        # Info Termo
+        self.contratado = contratado
         self.contrato = contrato 
         self.objeto = objeto 
         self.af = af
         self.mensagem = mensagem
         self.gestor = gestor
+
+        # Info Relatorio
+        self.liq = liq 
+        self.data = data 
+        self.valor = valor
+
         self.tipo = tipo
-        self.modelo = modelo 
+
+class Termo(): 
+
+    def __init__(self, termo, modelo, endereco):
+        pass 
 
     def criar_arquivo(self):
         
@@ -55,13 +77,8 @@ class Termo(Documento):
         definir_gestor(self)
         
         doc.save(self.endereco)
-    
-    def salvar_pdf(self):
-        docx = self.endereco
-        pdf = docx.replace("WORD", "PDF")
-        pdf = pdf.replace(".docx", ".pdf")
-        print(f"Convertendo termo para PDF.... *.✧*.✧.*.✧*.✧*.✧*.✧.,*.✧*. {self.contratado} - AF {self.af}")
-        try:
-            convert(docx, pdf)
-        except:
-            pass 
+
+class Relatorio():
+
+    def __init__(self, relatorio):
+        pass   

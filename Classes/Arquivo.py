@@ -1,10 +1,10 @@
 
+
 from openpyxl import load_workbook
 
-from MODULES.GerenciarArquivos import GerenciarArquivos
-from MODULES.EncontrarData import EncontrarData
+#from MODULES.GerenciarArquivos import GerenciarArquivos
+from Services.Calendario import EncontrarData
 
-from ENV.environment import pegar_modelos
 
 import shutil
 import locale
@@ -14,25 +14,20 @@ from docx2pdf import convert
 from copy import deepcopy
 
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from datetime import date
 from docx.shared import Pt
+from datetime import date
 
 
-class Documento: 
+class Arquivo: 
     
-    def __init__(self, contratado):
-        self.contratado = contratado
-        
-    def set_af(self, dado):
-        self.af = dado
-    
+    def __init__(self):
+        pass 
+
     def set_arq_nome(self, dado):
         self.arq = dado 
         
     def copiar_arquivo(self, antigo, novo):
         shutil.copy(antigo, novo)
-    
-
     
     def mudar_fonte(texto, name_font):
         texto.font.name = name_font
@@ -55,8 +50,8 @@ class Documento:
         run = paragrafo.add_run(str(texto))
         if (negrito): deixar_negrito(run)
         if (posicionamento != None): alinhar_texto(paragrafo, posicionamento)
-        if (px != None): Documento.mudar_tamanho(run, px)
-        if (fonte != None): Documento.mudar_fonte(run, fonte)
+        if (px != None): Arquivo.mudar_tamanho(run, px)
+        if (fonte != None): Arquivo.mudar_fonte(run, fonte)
 
     @staticmethod
     def encontrar_data_de_hoje_em_extenso():  
@@ -69,8 +64,8 @@ class Documento:
 
     @staticmethod
     def adicionar_linha_de_assinatura(paragrafo, assinador): 
-        Documento.criar_texto(paragrafo, f"________________________________________\n{assinador}", negrito = True, posicionamento = "Centro", fonte = "Cambria")
-    
+        Arquivo.criar_texto(paragrafo, f"________________________________________\n{assinador}", negrito = True, posicionamento = "Centro", fonte = "Cambria")
+
     @staticmethod
     def modificar_tabela(tabela, dados, fonte = "Cambria"): 
 
@@ -81,14 +76,8 @@ class Documento:
             celula = tabela.cell(dado["celula"][0], dado["celula"][1])
             paragrafo = celula.paragraphs[0]  
 
-            Documento.criar_texto(paragrafo, dado["conteudo"], dado["negrito"], fonte, px = 10)
+            Arquivo.criar_texto(paragrafo, dado["conteudo"], dado["negrito"], fonte, px = 10)
 
         return tabela
     
 
-                   
-
-        
-
- 
-        
