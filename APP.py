@@ -52,6 +52,7 @@ def MAIN():
     
     while True: 
         op = VISUAL(INICIALIZADOR)
+
         if (op["opcao"] == 1 or op["opcao"] == 2): 
             dados = analisarPlanilha(INICIALIZADOR) 
             gerarInformacao[op["opcao"]](dados, op) 

@@ -117,7 +117,7 @@ class Termo(Documento):
         try: 
             doc.save(self.endereco)
         except Exception as e:
-            pass 
+            print(e)
         else: 
             print(rf"Documento salvo: {self.endereco}, convertendo para PDF...")
         
