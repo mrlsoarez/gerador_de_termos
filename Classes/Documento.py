@@ -1,6 +1,7 @@
-from docx import Document 
-from docx2pdf import convert 
+from docx import Document  
 import os 
+import locale 
+
 
 from Classes.Arquivo import Arquivo
 
@@ -35,9 +36,6 @@ class Documento():
 
         self.tipo = tipo
 
-  
-
-        
 class Termo(Documento): 
 
     def __init__(self, termo, modelo, endereco):
@@ -118,14 +116,57 @@ class Termo(Documento):
         
         try: 
             doc.save(self.endereco)
-        except:
+        except Exception as e:
             pass 
         else: 
             print(rf"Documento salvo: {self.endereco}, convertendo para PDF...")
         
         Arquivo.salvarPDF(self.endereco)
 
-class Relatorio():
+class Relatorio(Documento):
 
-    def __init__(self, relatorio):
+    def __init__(self, relatorio, n_protocolo, modelo, endereco):
+        self.relatorio = relatorio 
+        self.n_protocolo = n_protocolo
+        self.modelo = modelo 
+        self.endereco = endereco
         pass   
+    
+    def setEndereco(self, endereco):
+        self.endereco = endereco 
+        
+    def criarArquivo(self, termos):
+        
+        doc = Document(self.modelo)
+        
+        def formatar_data(self, objeto):
+            return objeto.date().strftime("%d/%m/%Y")
+        
+        def converter_currency(self, valor):
+            locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
+            return locale.currency(float(valor), grouping =True)
+                    
+        def adicionar_protocolo(self):
+            substituir_protocolo = doc.paragraphs[1]
+            substituir_protocolo.text = ""
+            Arquivo.criar_texto(substituir_protocolo, f"PROTOCOLO DE RECEBIMENTO - NÚMERO {self.n_protocolo}", negrito = True)
+               
+        def criar_tabela(self, termos):
+            
+            for i in range(len(termos)):
+                
+                tabela = doc.tables[0]   
+                nova_linha = tabela.add_row()
+                                
+                coluna_um = nova_linha.cells[0].paragraphs[0]
+                coluna_dois = nova_linha.cells[1].paragraphs[0]
+                coluna_tres = nova_linha.cells[2].paragraphs[0]
+                coluna_quatro = nova_linha.cells[3].paragraphs[0]
+                Arquivo.criar_texto(coluna_um, termos[i].contratado,  px = 8, negrito = True, fonte = "Arial")
+                Arquivo.criar_texto(coluna_dois, termos[i].liq,  px = 8, negrito = True, fonte = "Arial")
+                Arquivo.criar_texto(coluna_tres, formatar_data(self, termos[i].data),  px = 8, negrito = True, fonte = "Arial")
+                Arquivo.criar_texto(coluna_quatro, converter_currency(self, termos[i].valor),  px = 8, negrito = True, fonte = "Arial")
+                                
+        adicionar_protocolo(self) 
+        criar_tabela(self, termos)
+        doc.save(rf"{self.endereco}\PROTOCOLO DE RECEBIMENTO - N° {self.n_protocolo}.docx")

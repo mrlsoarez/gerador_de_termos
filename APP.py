@@ -5,7 +5,7 @@ from tkinter import ttk
 from Env.env import inicializarAmbiente
 from Modules.Planilha import analisarPlanilha
 
-from Classes.Documento import Termo
+from Classes.Documento import Termo, Relatorio
 
 # Classes em português e camelCase 
 
@@ -16,7 +16,7 @@ def MAIN():
 
     def GERAR_TERMO(dados, op):
 
-        INICIALIZADOR.setModelo(op)
+        INICIALIZADOR.setModelo(op["opcao"])
         
         for chave in dados: 
             for index in range(len(dados[chave])): 
@@ -27,7 +27,22 @@ def MAIN():
                     termo.criarArquivo()
 
     def GERAR_RELATORIO(dados, op):
-        INICIALIZADOR.setModelo(op)
+        
+        INICIALIZADOR.setModelo(op["opcao"])
+        ARRAY = []
+        
+        if (op["tipo_relatorio"] == 1):
+            ARRAY = dados['contrato']
+        if (op["tipo_relatorio"] == 2):
+            ARRAY = dados['ata']
+        if (op["tipo_relatorio"] == 3):
+            ARRAY = dados['contrato']
+            for dado in dados['ata']:
+                ARRAY.append(dado)
+        
+        relatorio = Relatorio(ARRAY, INICIALIZADOR.numero_protocolo, INICIALIZADOR.modelo, INICIALIZADOR.pasta_atual)
+        relatorio.setEndereco(rf"{relatorio.endereco.rsplit("\\", 1)[0]}\PROTOCOLOS")
+        relatorio.criarArquivo(ARRAY)
         pass 
 
     gerarInformacao = {
@@ -36,17 +51,16 @@ def MAIN():
     }
     
     while True: 
-        #op = VISUAL(INICIALIZADOR)
-        op = 1
-        if (op == 1 or op == 2): 
+        op = VISUAL(INICIALIZADOR)
+        if (op["opcao"] == 1 or op["opcao"] == 2): 
             dados = analisarPlanilha(INICIALIZADOR) 
-            gerarInformacao[op](dados, op) 
+            gerarInformacao[op["opcao"]](dados, op) 
             break
         if (op == 4): 
             break 
     
+    
 def VISUAL(INICIALIZADOR):
-
     # ============================================================
     # CONFIGURAÇÕES
     # ============================================================
@@ -61,6 +75,7 @@ def VISUAL(INICIALIZADOR):
     FONTE_BOTAO = ("Segoe UI", 10, "bold")
     FONTE_RODAPE = ("Segoe UI", 8)
 
+
     # ============================================================
     # JANELA
     # ============================================================
@@ -70,6 +85,7 @@ def VISUAL(INICIALIZADOR):
     ROOT.title("Gerador de Termos")
     ROOT.geometry(f"{LARGURA}x{ALTURA}")
     ROOT.resizable(False, False)
+
 
     # ============================================================
     # HEADER
@@ -94,6 +110,7 @@ def VISUAL(INICIALIZADOR):
         font=FONTE_PROTOCOLO
     ).pack(side="right")
 
+
     # Linha
     ttk.Separator(
         ROOT,
@@ -103,6 +120,7 @@ def VISUAL(INICIALIZADOR):
         padx=35,
         pady=(5, 25)
     )
+
 
     # ============================================================
     # OPÇÕES
@@ -149,12 +167,102 @@ def VISUAL(INICIALIZADOR):
             fill="x"
         )
 
+
+    # ============================================================
+    # SEGUNDA TELA - TIPO DE RELATÓRIO
+    # ============================================================
+
+    def segunda_tela():
+
+        janela = tk.Toplevel(ROOT)
+
+        janela.title("Tipo de Relatório")
+        janela.geometry("500x350")
+        janela.resizable(False, False)
+
+        # Impede interação com a primeira tela
+        janela.grab_set()
+
+        tk.Label(
+            janela,
+            text="TIPO DE RELATÓRIO",
+            font=FONTE_TITULO
+        ).pack(
+            pady=(30, 20)
+        )
+
+        tipo_relatorio = tk.IntVar(value=0)
+
+        opcoes_relatorio = [
+            "1. CONTRATO",
+            "2. ATA",
+            "3. AMBOS"
+        ]
+
+        for i, texto in enumerate(opcoes_relatorio):
+
+            tk.Radiobutton(
+                janela,
+                text=texto,
+                variable=tipo_relatorio,
+                value=i + 1,
+                font=FONTE_OPCAO,
+                anchor="w",
+                padx=10,
+                pady=6,
+                cursor="hand2"
+            ).pack(
+                fill="x",
+                padx=55
+            )
+
+        def confirmar():
+
+            if tipo_relatorio.get() == 0:
+                return
+
+            resultado["tipo_relatorio"] = tipo_relatorio.get()
+
+            janela.destroy()
+            ROOT.destroy()
+
+        tk.Button(
+            janela,
+            text="CONFIRMAR",
+            width=18,
+            height=2,
+            font=FONTE_BOTAO,
+            cursor="hand2",
+            command=confirmar
+        ).pack(
+            pady=25
+        )
+
+
     # ============================================================
     # BOTÃO
     # ============================================================
 
+    resultado = {
+        "opcao": None,
+        "tipo_relatorio": None
+    }
+
+
     def enviar():
-        ROOT.destroy()
+
+        if opcao.get() == 0:
+            return
+
+        resultado["opcao"] = opcao.get()
+
+        # Se for GERAR RELATÓRIO
+        if opcao.get() == 2:
+            segunda_tela()
+
+        else:
+            ROOT.destroy()
+
 
     ttk.Separator(
         ROOT,
@@ -175,13 +283,14 @@ def VISUAL(INICIALIZADOR):
         command=enviar
     ).pack()
 
+
     # ============================================================
     # EXECUÇÃO
     # ============================================================
 
     ROOT.mainloop()
 
-    return opcao.get()
+    return resultado
 
 MAIN()
 

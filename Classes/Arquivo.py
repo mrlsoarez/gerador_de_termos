@@ -79,6 +79,7 @@ class Arquivo:
             Arquivo.criar_texto(paragrafo, dado["conteudo"], dado["negrito"], fonte, px = 10)
 
         return tabela
+    
     @staticmethod
     def salvarPDF(endereco):
         docx = endereco
@@ -86,5 +87,6 @@ class Arquivo:
         print(docx, pdf)
         try:
             convert(docx, pdf)
-        except:
+        except Exception as e:
+            print(e)
             pass 

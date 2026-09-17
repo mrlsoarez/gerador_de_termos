@@ -3,6 +3,8 @@ import os
 
 from openpyxl import load_workbook
 from pathlib import Path
+from datetime import date, timedelta
+import shutil
 
 from Services.Calendario import EncontrarData 
 
@@ -33,11 +35,43 @@ class Env:
         self.criarPasta(rf"{self.pasta_atual}\{EncontrarData("ano")}", navegar = True)
         self.criarPasta(rf"{self.pasta_atual}\{EncontrarData('mes', False)}. {EncontrarData('mes', True)}", navegar = True)
         self.criarPasta(rf"{self.pasta_atual}\{EncontrarData('dia')}-{EncontrarData('mes', False)}", navegar = True)
+    
+    def criarPastasProtocolos(self):
+        
+        PROTOCOLO = f"REMESSA - PROTOCOLO {self.numero_protocolo}"
+        
+        def encontrarProtocoloAnterior():
+            def encontrarDiaAnterior(): 
+                data = date.today() - timedelta(days=1)
+
+                while data.weekday() >= 5:
+                    data -= timedelta(days=1)
+
+                return data
+            
+            dataOntem = encontrarDiaAnterior()
+            mes = f"{dataOntem.month:02d}"
+            dia = f"{dataOntem.day:02d}"
+            
+            pastaOntem = rf"{self.pasta_atual.rsplit("\\", 1)[0]}\{dia}-{mes}\{PROTOCOLO}"
+            
+            if (os.path.exists(pastaOntem)):
+                try:
+                    shutil.copytree(pastaOntem, rf"{self.pasta_atual}\{PROTOCOLO}")
+                except: 
+                    pass 
+                finally: 
+                    self.pasta_atual = rf"{self.pasta_atual}\{PROTOCOLO}\TERMOS"
+                    return True
+                    
+        if (encontrarProtocoloAnterior()): return 
+        
         self.criarPasta(rf"{self.pasta_atual}\REMESSA - PROTOCOLO {self.numero_protocolo}", navegar = True)
         self.criarPasta(rf"{self.pasta_atual}\PROTOCOLOS")
         self.criarPasta(rf"{self.pasta_atual}\TERMOS", navegar = True)
         self.criarPasta(rf"{self.pasta_atual}\ATA")
         self.criarPasta(rf"{self.pasta_atual}\CONTRATO")
+        
 
     def setPlanilha(self):
         try: 
@@ -64,7 +98,7 @@ class Env:
     def setModelo(self, op):
         dict = {
             1: self.pasta_modelo + r"\MODELO DE TERMO.docx",
-            2: self.pasta_modelo + r"\MODELO DE RELATÓRIO.docx"
+            2: self.pasta_modelo + r"\MODELO DE PROTOCOLO.docx"
         }
         self.modelo = dict[op]
     
@@ -73,6 +107,7 @@ def inicializarAmbiente():
     controladorAmbiente.criarPastasIniciais()
     controladorAmbiente.setProtocolo()
     controladorAmbiente.criarPastasTermos()
+    controladorAmbiente.criarPastasProtocolos()
     controladorAmbiente.setPlanilha()
     return controladorAmbiente
 
