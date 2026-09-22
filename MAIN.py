@@ -391,7 +391,10 @@ def VISUAL():
                 "Escolha o tipo de termo que deseja gerar:",
                 ("Contrato", "Ata")
             ],
-
+              [
+                "Daaaaaa?",
+                ("Sim", "Não")
+                ],
             [
                 "Deseja analisar a planilha e gerar os documentos imediatamente?",
                 ("Sim", "Não")
