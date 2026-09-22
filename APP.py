@@ -47,8 +47,8 @@ def MAIN():
     
     def REINICIAR_PLANILHA(dados, op): 
         marcados = VISUAL_PLANILHA(dados)
-        #resetarPlanilha(marcados, INICIALIZADOR)
-        #INICIALIZADOR.setPlanilha()
+        resetarPlanilha(marcados, INICIALIZADOR)
+        INICIALIZADOR.setPlanilha()
         dados = analisarPlanilha(INICIALIZADOR)
         INICIALIZADOR.copiarTermosAnteriores(dados)
         
@@ -68,7 +68,7 @@ def MAIN():
             break
         elif (op["opcao"] == 3):
             INICIALIZADOR.incrementarProtocolo()
-            INICIALIZADOR.setProtocolo()
+            INICIALIZADOR = inicializarAmbiente()
         elif (op["opcao"] == 5): 
             break 
     

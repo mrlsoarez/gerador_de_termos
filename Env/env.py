@@ -23,6 +23,7 @@ class Env:
         self.pastaProtocolo = rf"{self.pastaBase}\MODELOS BASE\2. CONTROLE PROTOCOLO"
         self.pastaModelo = rf"{self.pastaBase}\MODELOS BASE\3. MODELOS DE DOCUMENTOS"
         self.pastaAtual = self.pastaBase 
+        self.protocoloAntigo = None
         pass 
 
     def criarPasta(self, pasta, navegar=False):
@@ -70,10 +71,9 @@ class Env:
                 count += 1
                 
         pastasProtocolosHoje = self.gerenciador.listarArquivos(self.pastaHoje)
-       
+
         if (len(pastasProtocolosHoje) > 1): 
             self.protocoloAntigo = encontrarProtocoloAntigo(self.pastaHoje)
-            print(self.protocoloAntigo)
     
     def setPastaAnterior(self): 
         pastasDatas = self.gerenciador.listarArquivos(self.pastaHoje.rsplit("\\", 1)[0])
@@ -86,12 +86,28 @@ class Env:
         self.pastaAnterior = rf"{self.pastaHoje.rsplit("\\", 1)[0]}\{pastaAnterior}"
         pass 
     
-    def copiarTermosAnteriores(self, arq): 
+    # Fazer a distinção entre protocolo anterior e novo, copiando os mantidos na planilha para
+        # a nova pasta e com a ordem rearranjada (organizar tudo na pasta anterior também)
+    def copiarTermosAnteriores(self, dados): 
 
         protocolo = f"REMESSA - PROTOCOLO {self.numeroProtocolo}"
-        #print(self.pastaAnterior, self.pastaHoje, self.protocoloAntigo)
+        for chave in dados:
+            pastaNova = rf"{self.pastaAtual}\{chave.upper()}"
+            pastaAntiga = rf"{self.protocoloAntigo}\TERMOS\{chave.upper()}"
+            arquivos = self.gerenciador.listarArquivos(pastaAntiga)
+            for index in range(len(dados[chave])): 
+                dado = dados[chave][index] 
+                nomeArquivo = f"{dado.contratado} - AF {dado.af[:4]}"
+                for arq in arquivos: 
+                    if (nomeArquivo in arq): 
+                        ext = os.path.splitext(arq)[1]
+                        copiarArquivoAntigo = rf"{pastaAntiga}\{arq}"
+                        copiarArquivoNovo = rf"{pastaNova}\{index+1}. {nomeArquivo}{ext}"                   
+                        if self.gerenciador.arquivoExiste(rf"{copiarArquivoAntigo}"): 
+                            self.gerenciador.copiarArquivo(copiarArquivoAntigo, copiarArquivoNovo)
+                            self.gerenciador.removerArquivo(copiarArquivoAntigo)
+            self.gerenciador.corrigirOrdemArquivos(pastaAntiga)
         """
-        
         def encontrarDiaAnterior(): 
             data = date.today() - timedelta(days=1)
             while data.weekday() >= 5:
@@ -141,6 +157,8 @@ class Env:
 
         """
     
+    # Copiar protocolo anterior, a partir da última data anterior encontrada. O protocolo permanece o atual,
+        # apenas transportado para o dia atual
     def copiarProtocoloAnterior(self): 
         protocolo = f"REMESSA - PROTOCOLO {self.numeroProtocolo}"
         pastaAnterior = rf"{self.pastaAnterior}\{protocolo}"
@@ -151,7 +169,7 @@ class Env:
                 print(e) 
             finally: 
                 self.pastaAtual = rf"{self.pastaAtual}\{protocolo}\TERMOS"
-                #self.gerenciador.removerPasta(pastaAnterior)
+                self.gerenciador.removerPasta(pastaAnterior)
                 return True
     
     def criarPastasProtocolos(self):
