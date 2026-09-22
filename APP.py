@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 
 from Env.env import inicializarAmbiente
-from Modules.Planilha import analisarPlanilha
+from Modules.Planilha import analisarPlanilha, resetarPlanilha
 
 from Classes.Documento import Termo, Relatorio
 
@@ -20,9 +20,9 @@ def MAIN():
         
         for chave in dados: 
             for index in range(len(dados[chave])): 
-                termo = Termo(dados[chave][index], INICIALIZADOR.modelo, INICIALIZADOR.pasta_atual)
+                termo = Termo(dados[chave][index], INICIALIZADOR.modelo, INICIALIZADOR.pastaAtual)
                 termo.setOrdem(index+1)                
-                termo.setEndereco(rf"{INICIALIZADOR.pasta_atual}\{dados[chave][index].tipo}")            
+                termo.setEndereco(rf"{INICIALIZADOR.pastaAtual}\{dados[chave][index].tipo}")            
                 if not termo.verificarSeExiste():
                     termo.criarArquivo()
 
@@ -40,26 +40,37 @@ def MAIN():
             for dado in dados['ata']:
                 ARRAY.append(dado)
         
-        relatorio = Relatorio(ARRAY, INICIALIZADOR.numero_protocolo, INICIALIZADOR.modelo, INICIALIZADOR.pasta_atual)
+        relatorio = Relatorio(ARRAY, INICIALIZADOR.numeroProtocolo, INICIALIZADOR.modelo, INICIALIZADOR.pastaAtual)
         relatorio.setEndereco(rf"{relatorio.endereco.rsplit("\\", 1)[0]}\PROTOCOLOS")
         relatorio.criarArquivo(ARRAY)
         pass 
-
+    
+    def REINICIAR_PLANILHA(dados, op): 
+        marcados = VISUAL_PLANILHA(dados)
+        #resetarPlanilha(marcados, INICIALIZADOR)
+        #INICIALIZADOR.setPlanilha()
+        dados = analisarPlanilha(INICIALIZADOR)
+        INICIALIZADOR.copiarTermosAnteriores(dados)
+        
     gerarInformacao = {
         1: GERAR_TERMO,
-        2: GERAR_RELATORIO
+        2: GERAR_RELATORIO,
+        4: REINICIAR_PLANILHA
     }
     
     while True: 
+        
         op = VISUAL(INICIALIZADOR)
 
-        if (op["opcao"] == 1 or op["opcao"] == 2): 
+        if (op["opcao"] == 1 or op["opcao"] == 2 or op["opcao"] == 4): 
             dados = analisarPlanilha(INICIALIZADOR) 
             gerarInformacao[op["opcao"]](dados, op) 
             break
-        if (op == 4): 
+        elif (op["opcao"] == 3):
+            INICIALIZADOR.incrementarProtocolo()
+            INICIALIZADOR.setProtocolo()
+        elif (op["opcao"] == 5): 
             break 
-    
     
 def VISUAL(INICIALIZADOR):
     # ============================================================
@@ -107,7 +118,7 @@ def VISUAL(INICIALIZADOR):
 
     tk.Label(
         header,
-        text=f"N° PROTOCOLO: {INICIALIZADOR.numero_protocolo}",
+        text=f"N° PROTOCOLO: {INICIALIZADOR.numeroProtocolo}",
         font=FONTE_PROTOCOLO
     ).pack(side="right")
 
@@ -149,7 +160,8 @@ def VISUAL(INICIALIZADOR):
         "1. GERAR TERMOS",
         "2. GERAR RELATÓRIO",
         "3. ATUALIZAR PROTOCOLO",
-        "4. ENCERRAR"
+        "4. REINICIAR PLANILHA",
+        "5. ENCERRAR"
     ]
 
     for i, texto in enumerate(opcoes):
@@ -288,6 +300,243 @@ def VISUAL(INICIALIZADOR):
     # ============================================================
     # EXECUÇÃO
     # ============================================================
+
+    ROOT.mainloop()
+
+    return resultado
+
+def VISUAL_PLANILHA(dados): 
+    LARGURA = 650
+    ALTURA = 500
+
+    FONTE_TITULO = ("Segoe UI", 19, "bold")
+    FONTE_LABEL = ("Segoe UI", 11, "bold")
+    FONTE_OPCAO = ("Segoe UI", 10)
+
+    ROOT = tk.Tk()
+
+    ROOT.title("Seleção de Itens")
+    ROOT.geometry(f"{LARGURA}x{ALTURA}")
+    ROOT.resizable(False, False)
+
+
+    # ============================================================
+    # HEADER
+    # ============================================================
+
+    header = tk.Frame(ROOT)
+    header.pack(
+        fill="x",
+        padx=35,
+        pady=(25, 10)
+    )
+
+    tk.Label(
+        header,
+        text="SELEÇÃO DE ITENS",
+        font=FONTE_TITULO
+    ).pack(side="left")
+
+
+    ttk.Separator(
+        ROOT,
+        orient="horizontal"
+    ).pack(
+        fill="x",
+        padx=35,
+        pady=(5, 20)
+    )
+
+
+    # ============================================================
+    # INSTRUÇÃO
+    # ============================================================
+
+    tk.Label(
+        ROOT,
+        text="Marque os itens que deseja processar",
+        font=FONTE_LABEL,
+        anchor="w"
+    ).pack(
+        fill="x",
+        padx=55,
+        pady=(0, 10)
+    )
+
+
+    # ============================================================
+    # ÁREA COM SCROLL
+    # ============================================================
+
+    container = tk.Frame(ROOT)
+    container.pack(
+        fill="both",
+        expand=True,
+        padx=45,
+        pady=(0, 10)
+    )
+
+    # Canvas
+    canvas = tk.Canvas(
+        container,
+        highlightthickness=0
+    )
+
+    # Scrollbar
+    scrollbar = ttk.Scrollbar(
+        container,
+        orient="vertical",
+        command=canvas.yview
+    )
+
+    # Frame que ficará dentro do Canvas
+    frame_itens = tk.Frame(canvas)
+
+    frame_itens.bind(
+        "<Configure>",
+        lambda e: canvas.configure(
+            scrollregion=canvas.bbox("all")
+        )
+    )
+
+    canvas.create_window(
+        (0, 0),
+        window=frame_itens,
+        anchor="nw"
+    )
+
+    canvas.configure(
+        yscrollcommand=scrollbar.set
+    )
+
+    canvas.pack(
+        side="left",
+        fill="both",
+        expand=True
+    )
+
+    scrollbar.pack(
+        side="right",
+        fill="y"
+    )
+
+
+    # ============================================================
+    # CHECKBOXES
+    # ============================================================
+
+    checkboxes = []
+
+    for chave in dados:
+
+        # Título da categoria
+        tk.Label(
+            frame_itens,
+            text=chave.upper(),
+            font=FONTE_LABEL,
+            anchor="w"
+        ).pack(
+            fill="x",
+            pady=(8, 5)
+        )
+
+        for dado in dados[chave]:
+
+            marcado = tk.BooleanVar(value=False)
+
+            texto = f"{dado.contratado} - {dado.af}"
+
+            checkbox = tk.Checkbutton(
+                frame_itens,
+                text=texto,
+                variable=marcado,
+                font=FONTE_OPCAO,
+                anchor="w",
+                padx=5,
+                pady=3
+            )
+
+            checkbox.pack(
+                fill="x"
+            )
+
+            checkboxes.append(
+                (chave, dado, marcado)
+            )
+
+
+    # ============================================================
+    # RESULTADO
+    # ============================================================
+
+    resultado = {}
+
+
+    def confirmar():
+
+        resultado.clear()
+
+        for chave in dados:
+
+            resultado[chave] = []
+
+        for chave, dado, marcado in checkboxes:
+
+            # Marcado = TRUE
+            # Não entra no array
+
+            if marcado.get() is False:
+
+                # Desmarcado = FALSE
+                # Entra no array
+
+                resultado[chave].append(dado.ordem)
+
+        ROOT.destroy()
+
+
+    # ============================================================
+    # BOTÃO
+    # ============================================================
+
+    ttk.Separator(
+        ROOT,
+        orient="horizontal"
+    ).pack(
+        fill="x",
+        padx=35,
+        pady=(5, 10)
+    )
+
+    tk.Button(
+        ROOT,
+        text="CONFIRMAR",
+        width=18,
+        height=2,
+        font=("Segoe UI", 10, "bold"),
+        cursor="hand2",
+        command=confirmar
+    ).pack(
+        pady=(0, 15)
+    )
+
+
+    # ============================================================
+    # MOUSE WHEEL
+    # ============================================================
+
+    def scroll(event):
+
+        canvas.yview_scroll(
+            int(-1 * (event.delta / 120)),
+            "units"
+        )
+
+    canvas.bind_all(
+        "<MouseWheel>",
+        scroll
+    )
+
 
     ROOT.mainloop()
 

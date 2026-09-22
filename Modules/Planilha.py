@@ -1,4 +1,5 @@
 from Classes.Documento import Documento 
+import win32com.client
 
 # Lê a planilha e verifica se existem campos vazios     
 
@@ -44,8 +45,41 @@ def analisarPlanilha(inicializador):
                     tipo = planilha[sheet][mapa["tipo"]].value
                 )
                 
-                
-                DADOS[doc.tipo.lower()].append(doc)
+                try:
+                    DADOS[doc.tipo.lower()].append(doc)
+                except: 
+                    pass
 
     return DADOS
 
+def resetarPlanilha(ordens, inicializador): 
+    
+    caminho = inicializador.caminhoPlanilha
+
+    excel = win32com.client.Dispatch("Excel.Application")
+    excel.Visible = False
+    excel.DisplayAlerts = False
+
+    try:
+
+        wb = excel.Workbooks.Open(caminho)
+        for key in ordens:
+            for ordem in ordens[key]:
+                try:
+                    wb.Worksheets(str(ordem)).Delete()
+                except Exception as e:
+                    print(f"Erro ao remover '{ordem}': {e}")
+        
+        numero = 1
+        quantidade = wb.Worksheets.Count
+        for i in range(1, quantidade + 1):
+            sheet = wb.Worksheets(i)
+            if "base" not in sheet.Name.lower():
+                novo_nome = str(numero)
+                sheet.Name = novo_nome
+                numero += 1
+        
+        wb.Save()
+        wb.Close()
+    finally:
+        excel.Quit()
