@@ -47,8 +47,8 @@ def MAIN():
     
     def REINICIAR_PLANILHA(dados, op): 
         marcados = VISUAL_PLANILHA(dados)
-        resetarPlanilha(marcados, INICIALIZADOR)
-        INICIALIZADOR.setPlanilha()
+        #resetarPlanilha(marcados, INICIALIZADOR)
+        #INICIALIZADOR.setPlanilha()
         dados = analisarPlanilha(INICIALIZADOR)
         INICIALIZADOR.copiarTermosAnteriores(dados)
         
@@ -58,7 +58,7 @@ def MAIN():
         4: REINICIAR_PLANILHA
     }
     
-    while True: 
+    while True:
         
         op = VISUAL(INICIALIZADOR)
 
