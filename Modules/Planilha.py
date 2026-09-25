@@ -105,18 +105,17 @@ def regularPlanilha(planilha):
     
     sheetsProntas = []
     modelo = planilha.Sheets("Modelo")
-    print(modelo)
-    for sheet in planilha.sheetnames:
+    for sheet in planilha.Sheets:
         try: 
-            parse = int(sheet)
+            parse = int(sheet.Name)
         except: 
             pass 
         else: 
-            sheetsProntas.append(sheet)
+            sheetsProntas.append(sheet.Name)
     
     ultimaOrdem = encontrarUltimaOrdem(sheetsProntas)
-    
-    for i in range(ultimaOrdem+1, 11):
+    print(planilha.Sheets, planilha.Sheets("Modelo"))
+    for i in range(ultimaOrdem+1, 11): 
         modelo.Copy(After=planilha.Sheets(planilha.Sheets.Count))
         planilha.Sheets(planilha.Sheets.Count).Name = str(i)
     
