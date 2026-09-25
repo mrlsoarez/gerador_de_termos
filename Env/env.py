@@ -186,7 +186,7 @@ class Env:
 
     def setPlanilha(self):
         try: 
-            self.caminhoPlanilha = rf"{self.pastaPlanilha}\ANÁLISE FISCAL.xlsx"
+            self.caminhoPlanilha = rf"{self.pastaPlanilha}\ANÁLISE FISCAL - Copia.xlsx"
             planilha = load_workbook(rf"{self.caminhoPlanilha}", data_only=True)
         except Exception as e: 
             print(e)

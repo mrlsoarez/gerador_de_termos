@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 
 from Env.env import inicializarAmbiente
-from Modules.Planilha import analisarPlanilha, resetarPlanilha
+from Modules.Planilha import analisarPlanilha, resetarPlanilha, regularPlanilha
 
 from Classes.Documento import Termo, Relatorio
 
@@ -47,10 +47,11 @@ def MAIN():
     
     def REINICIAR_PLANILHA(dados, op): 
         marcados = VISUAL_PLANILHA(dados)
-        #resetarPlanilha(marcados, INICIALIZADOR)
+        #regularPlanilha(INICIALIZADOR)
+        resetarPlanilha(marcados, INICIALIZADOR)
         #INICIALIZADOR.setPlanilha()
-        dados = analisarPlanilha(INICIALIZADOR)
-        INICIALIZADOR.copiarTermosAnteriores(dados)
+        #dados = analisarPlanilha(INICIALIZADOR)
+        #INICIALIZADOR.copiarTermosAnteriores(dados)
         
     gerarInformacao = {
         1: GERAR_TERMO,

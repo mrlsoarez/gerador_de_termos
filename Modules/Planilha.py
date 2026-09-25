@@ -59,7 +59,18 @@ def resetarPlanilha(ordens, inicializador):
     excel = win32com.client.Dispatch("Excel.Application")
     excel.Visible = False
     excel.DisplayAlerts = False
-
+    try: 
+        wb = excel.Workbooks.Open(caminho)
+        regularPlanilha(wb)
+    except Exception as e: 
+        print(e)
+    else: 
+        wb.Save()
+        wb.Close()
+    finally: 
+        excel.quit()
+    """
+    
     try:
 
         wb = excel.Workbooks.Open(caminho)
@@ -83,3 +94,32 @@ def resetarPlanilha(ordens, inicializador):
         wb.Close()
     finally:
         excel.Quit()
+        
+    """
+def regularPlanilha(planilha):
+    
+    def encontrarUltimaOrdem(array):
+        array.sort(key=int)
+        ultimoIndex = len(array) - 1
+        return int(array[ultimoIndex])
+    
+    sheetsProntas = []
+    modelo = planilha.Sheets("Modelo")
+    print(modelo)
+    for sheet in planilha.sheetnames:
+        try: 
+            parse = int(sheet)
+        except: 
+            pass 
+        else: 
+            sheetsProntas.append(sheet)
+    
+    ultimaOrdem = encontrarUltimaOrdem(sheetsProntas)
+    
+    for i in range(ultimaOrdem+1, 11):
+        modelo.Copy(After=planilha.Sheets(planilha.Sheets.Count))
+        planilha.Sheets(planilha.Sheets.Count).Name = str(i)
+    
+   
+    
+    #planilha.save(rf"{inicializador.pastaPlanilha}\a.xlsx")
