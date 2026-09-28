@@ -186,7 +186,7 @@ class Env:
 
     def setPlanilha(self):
         try: 
-            self.caminhoPlanilha = rf"{self.pastaPlanilha}\ANÁLISE FISCAL - Copia.xlsx"
+            self.caminhoPlanilha = rf"{self.pastaPlanilha}\ANÁLISE FISCAL - Reduzida.xlsx"
             planilha = load_workbook(rf"{self.caminhoPlanilha}", data_only=True)
         except Exception as e: 
             print(e)
@@ -208,9 +208,9 @@ class Env:
         self.modelo = modelos[op]
 
     def verificarArquivo(self, caminho, caminhoNovo, nome, ordem):
-        
-        #arquivos = operacoesOs.listarArquivos(caminho) 
         """
+        
+        arquivos = operacoesOs.listarArquivos(caminho) 
         
         for arq in arquivos: 
             if nome in arq: 
@@ -222,8 +222,9 @@ class Env:
                     operacoesOs.removerArquivo(pastaOrigem)
         
         operacoesOs.corrigirOrdemArquivos(caminho)
-
         """
+
+        
 class OperacoesOs:
 
     def __init__(self, env):

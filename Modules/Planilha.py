@@ -59,6 +59,8 @@ def resetarPlanilha(ordens, inicializador):
     excel = win32com.client.Dispatch("Excel.Application")
     excel.Visible = False
     excel.DisplayAlerts = False
+    
+    
     try: 
         wb = excel.Workbooks.Open(caminho)
         regularPlanilha(wb)
@@ -68,7 +70,9 @@ def resetarPlanilha(ordens, inicializador):
         wb.Save()
         wb.Close()
     finally: 
-        excel.quit()
+        excel.Quit()
+    
+
     """
     
     try:
@@ -94,31 +98,36 @@ def resetarPlanilha(ordens, inicializador):
         wb.Close()
     finally:
         excel.Quit()
-        
     """
-def regularPlanilha(planilha):
-    
-    def encontrarUltimaOrdem(array):
-        array.sort(key=int)
-        ultimoIndex = len(array) - 1
-        return int(array[ultimoIndex])
-    
-    sheetsProntas = []
-    modelo = planilha.Sheets("Modelo")
-    for sheet in planilha.Sheets:
-        try: 
-            parse = int(sheet.Name)
-        except: 
-            pass 
-        else: 
-            sheetsProntas.append(sheet.Name)
-    
-    ultimaOrdem = encontrarUltimaOrdem(sheetsProntas)
-    print(planilha.Sheets, planilha.Sheets("Modelo"))
-    for i in range(ultimaOrdem+1, 11): 
-        modelo.Copy(After=planilha.Sheets(planilha.Sheets.Count))
-        planilha.Sheets(planilha.Sheets.Count).Name = str(i)
-    
+        
+  
+def regularPlanilha(wb):
+    if wb.ProtectStructure:
+        raise RuntimeError("Estrutura da pasta de trabalho protegida.")
+
+    existentes = {s.Name for s in wb.Sheets}
+    numeros = [int(n) for n in existentes if n.isdigit()]
+    ultimaOrdem = max(numeros) if numeros else 0
+
+    modelo = wb.Sheets("Modelo")
+    print("Abas antes:", [s.Name for s in wb.Sheets], "| última ordem:", ultimaOrdem)
+
+    for i in range(ultimaOrdem + 1, 101):
+        nome = str(i)
+        if nome in existentes:
+            continue
+
+        antes = wb.Sheets.Count
+        modelo.Copy(None, wb.Sheets(wb.Sheets.Count))  # Before=None, After=última
+        depois = wb.Sheets.Count
+
+        if depois != antes + 1:
+            raise RuntimeError(f"A cópia para '{nome}' não criou uma aba nova.")
+
+        nova = wb.ActiveSheet          # a cópia fica ativa após o Copy
+        nova.Name = nome
+        existentes.add(nome)
+        print(f"Criada aba {nome}. Abas agora:", [s.Name for s in wb.Sheets])
    
     
     #planilha.save(rf"{inicializador.pastaPlanilha}\a.xlsx")

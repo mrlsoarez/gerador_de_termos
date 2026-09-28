@@ -49,9 +49,9 @@ def MAIN():
         marcados = VISUAL_PLANILHA(dados)
         #regularPlanilha(INICIALIZADOR)
         resetarPlanilha(marcados, INICIALIZADOR)
-        #INICIALIZADOR.setPlanilha()
-        #dados = analisarPlanilha(INICIALIZADOR)
-        #INICIALIZADOR.copiarTermosAnteriores(dados)
+        INICIALIZADOR.setPlanilha()
+        dados = analisarPlanilha(INICIALIZADOR)
+        INICIALIZADOR.copiarTermosAnteriores(dados)
         
     gerarInformacao = {
         1: GERAR_TERMO,
