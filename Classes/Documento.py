@@ -8,16 +8,16 @@ from Classes.Arquivo import Arquivo
 class Documento():
 
     mapa = {
-        "contratado": "B4",
-        "n_contrato": "E4",
-        "objeto": "F4",
-        "numero_empenho": "A8",
-        "numero_liquidacao": "A12",
-        "data_liquidacao": "B12",
-        "valor_bruto_liquidacao": "C12",
-        "tipo_nota": "D16",
-        "numero_af": "A20",
-        "tipo": "B5"
+        "processo": "B7",
+        "contratado": "C7",
+        "n_contrato": "E7",
+        "objeto": "F7",
+        "numero_liquidacao": "B12",
+        "data_liquidacao": "D12",
+        "valor_bruto_liquidacao": "G12",
+        "tipo_nota": "D15",
+        "numero_af": "B15",
+        "tipo": "C9"
     }
 
     def __init__(self, ordem, contratado, contrato, objeto, af, tipo_nota, liq, data, valor, tipo):

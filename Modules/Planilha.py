@@ -7,8 +7,7 @@ def analisarPlanilha(inicializador):
 
     def seNaoExistemCamposVazios(mapa, planilha, sheet):
         verificacao = True 
-
-        if (planilha[sheet]["A4"].value == None or (planilha[sheet]["B4"].value == None)):
+        if (planilha[sheet][mapa["processo"]].value == None or (planilha[sheet][mapa["contratado"]] == None)):
             verificacao = False 
             return verificacao
 
@@ -54,6 +53,79 @@ def analisarPlanilha(inicializador):
 
 def resetarPlanilha(ordens, inicializador): 
     
+    mapa = Documento.mapa 
+    
+    def removerInformacoes(wb, ordens): 
+        for key in ordens:
+            for ordem in ordens[key]:
+                try:
+                    wb.Worksheets(str(ordem)).Delete()
+                except Exception as e:
+                    print(f"Erro ao remover '{ordem}': {e}")
+        for s in wb.Worksheets: 
+            print(s.Range(mapa["processo"]))
+            """
+             
+            numero = 1
+            quantidade = wb.Worksheets.Count
+            for i in range(1, quantidade + 1):
+                sheet = wb.Worksheets(i)
+                if "base" not in sheet.Name.lower():
+                    novo_nome = str(numero)
+                    sheet.Name = novo_nome
+                    numero += 1
+            """
+    def regularInformacoes(wb, total=10):
+        modelo = wb.Sheets("Modelo")
+        for s in wb.Sheets:
+            print()
+        """
+        
+        if wb.ProtectStructure:
+            raise RuntimeError("Workbook structure is protected.")
+
+
+        # 1) Collect numbered sheets, sorted by their current number
+        numeradas = []
+        for s in wb.Sheets: 
+            print(s, wb.Sheets(s))
+            try: 
+                parse = int(wb.Sheets(s).Name) 
+            except: 
+                pass 
+            else: 
+                numeradas.append(wb.Sheets(s).Name)
+        #numeradas = [s for s in wb.Sheets if s.Name.isdigit()]
+        #numeradas.sort(key=lambda s: int(s.Name))
+        #print("Original order:", [s.Name for s in numeradas])
+        print(numeradas)
+
+        # 2) Rename to temporary names first (avoids collisions like 8 -> 4 when a "4" exists)
+        for k, s in enumerate(numeradas):
+            s.Name = f"__tmp_{k}"
+
+        # 3) Final names 1..N, and reorder the tabs
+        for k, s in enumerate(numeradas, start=1):
+            s.Name = str(k)
+        for prev, s in zip(numeradas, numeradas[1:]):
+            s.Move(After=prev)
+
+        ultima = numeradas[-1] if numeradas else modelo
+        print("Preserved sheets:", [s.Name for s in numeradas])
+
+        # 4) Add empty copies of Modelo up to `total`
+        for i in range(len(numeradas) + 1, total + 1):
+            modelo.Copy(After=ultima)
+            nova = wb.ActiveSheet          # the copy becomes the active sheet
+            nova.Name = str(i)
+            ultima = nova                  # next copy goes after this one
+            print(f"Created sheet {i}")
+
+        print("Final order:", [s.Name for s in wb.Sheets])
+        """
+    
+        
+        #planilha.save(rf"{inicializador.pastaPlanilha}\a.xlsx")
     caminho = inicializador.caminhoPlanilha
 
     excel = win32com.client.Dispatch("Excel.Application")
@@ -63,7 +135,8 @@ def resetarPlanilha(ordens, inicializador):
     
     try: 
         wb = excel.Workbooks.Open(caminho)
-        regularPlanilha(wb)
+        removerInformacoes(wb, ordens)
+        regularInformacoes(wb)
     except Exception as e: 
         print(e)
     else: 
@@ -77,22 +150,7 @@ def resetarPlanilha(ordens, inicializador):
     
     try:
 
-        wb = excel.Workbooks.Open(caminho)
-        for key in ordens:
-            for ordem in ordens[key]:
-                try:
-                    wb.Worksheets(str(ordem)).Delete()
-                except Exception as e:
-                    print(f"Erro ao remover '{ordem}': {e}")
-        
-        numero = 1
-        quantidade = wb.Worksheets.Count
-        for i in range(1, quantidade + 1):
-            sheet = wb.Worksheets(i)
-            if "base" not in sheet.Name.lower():
-                novo_nome = str(numero)
-                sheet.Name = novo_nome
-                numero += 1
+       
         
         wb.Save()
         wb.Close()
@@ -101,33 +159,4 @@ def resetarPlanilha(ordens, inicializador):
     """
         
   
-def regularPlanilha(wb):
-    if wb.ProtectStructure:
-        raise RuntimeError("Estrutura da pasta de trabalho protegida.")
 
-    existentes = {s.Name for s in wb.Sheets}
-    numeros = [int(n) for n in existentes if n.isdigit()]
-    ultimaOrdem = max(numeros) if numeros else 0
-
-    modelo = wb.Sheets("Modelo")
-    print("Abas antes:", [s.Name for s in wb.Sheets], "| última ordem:", ultimaOrdem)
-
-    for i in range(ultimaOrdem + 1, 101):
-        nome = str(i)
-        if nome in existentes:
-            continue
-
-        antes = wb.Sheets.Count
-        modelo.Copy(None, wb.Sheets(wb.Sheets.Count))  # Before=None, After=última
-        depois = wb.Sheets.Count
-
-        if depois != antes + 1:
-            raise RuntimeError(f"A cópia para '{nome}' não criou uma aba nova.")
-
-        nova = wb.ActiveSheet          # a cópia fica ativa após o Copy
-        nova.Name = nome
-        existentes.add(nome)
-        print(f"Criada aba {nome}. Abas agora:", [s.Name for s in wb.Sheets])
-   
-    
-    #planilha.save(rf"{inicializador.pastaPlanilha}\a.xlsx")

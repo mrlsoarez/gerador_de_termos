@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 
 from Env.env import inicializarAmbiente
-from Modules.Planilha import analisarPlanilha, resetarPlanilha, regularPlanilha
+from Modules.Planilha import analisarPlanilha, resetarPlanilha
 
 from Classes.Documento import Termo, Relatorio
 
